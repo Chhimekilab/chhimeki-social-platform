@@ -21,8 +21,7 @@ import {
   Trophy, 
   Camera, 
   Clock, 
-  ChevronRight,
-  Menu
+  ChevronRight
 } from 'lucide-react';
 
 const App = () => {
@@ -36,35 +35,32 @@ const App = () => {
   const [privacyLevel, setPrivacyLevel] = useState('friends');
   const [selectedCategory, setSelectedCategory] = useState('news');
 
-  // News categories with BBC-style colors
   const categories = [
-    { id: 'all', name: 'All', icon: Globe, color: 'bg-gray-700', textColor: 'text-gray-700' },
-    { id: 'news', name: 'News', icon: Clock, color: 'bg-red-600', textColor: 'text-red-600' },
-    { id: 'politics', name: 'Politics', icon: Building, color: 'bg-blue-700', textColor: 'text-blue-700' },
-    { id: 'economy', name: 'Economy', icon: TrendingUp, color: 'bg-green-600', textColor: 'text-green-600' },
-    { id: 'sports', name: 'Sports', icon: Trophy, color: 'bg-orange-600', textColor: 'text-orange-600' },
-    { id: 'entertainment', name: 'Entertainment', icon: PlayCircle, color: 'bg-purple-600', textColor: 'text-purple-600' },
-    { id: 'technology', name: 'Technology', icon: Settings, color: 'bg-indigo-600', textColor: 'text-indigo-600' },
-    { id: 'health', name: 'Health', icon: Heart, color: 'bg-pink-600', textColor: 'text-pink-600' },
-    { id: 'culture', name: 'Culture', icon: Camera, color: 'bg-yellow-600', textColor: 'text-yellow-600' }
+    { id: 'all', name: 'All', icon: Globe, color: 'bg-gray-700' },
+    { id: 'news', name: 'News', icon: Clock, color: 'bg-red-600' },
+    { id: 'politics', name: 'Politics', icon: Building, color: 'bg-blue-700' },
+    { id: 'economy', name: 'Economy', icon: TrendingUp, color: 'bg-green-600' },
+    { id: 'sports', name: 'Sports', icon: Trophy, color: 'bg-orange-600' },
+    { id: 'entertainment', name: 'Entertainment', icon: PlayCircle, color: 'bg-purple-600' },
+    { id: 'technology', name: 'Technology', icon: Settings, color: 'bg-indigo-600' },
+    { id: 'health', name: 'Health', icon: Heart, color: 'bg-pink-600' },
+    { id: 'culture', name: 'Culture', icon: Camera, color: 'bg-yellow-600' }
   ];
 
   const privacyLevels = [
-    { value: 'public', label: 'Public', icon: Globe, description: 'Everyone can see' },
-    { value: 'friends', label: 'Friends', icon: UserCheck, description: 'Friends only' },
-    { value: 'family', label: 'Family', icon: Heart, description: 'Family members only' },
-    { value: 'professional', label: 'Professional', icon: Building, description: 'Professional network' },
-    { value: 'private', label: 'Private', icon: Lock, description: 'Only you' }
+    { value: 'public', label: 'Public', icon: Globe },
+    { value: 'friends', label: 'Friends', icon: UserCheck },
+    { value: 'family', label: 'Family', icon: Heart },
+    { value: 'professional', label: 'Professional', icon: Building },
+    { value: 'private', label: 'Private', icon: Lock }
   ];
 
-  // Initialize demo data
   useEffect(() => {
     setCurrentUser({
       id: 1,
       name: 'Demo User',
       email: 'demo@chhimeki.com',
-      avatar: '👤',
-      relationshipStatus: 'private'
+      avatar: '👤'
     });
 
     setPosts([
@@ -78,7 +74,6 @@ const App = () => {
         comments: 18,
         privacy: 'public',
         category: 'news',
-        community: 'Global News Hub',
         trending: true,
         isBreaking: true
       },
@@ -91,14 +86,13 @@ const App = () => {
         likes: 89,
         comments: 12,
         privacy: 'professional',
-        category: 'economy',
-        relationship: 'Professional Network'
+        category: 'economy'
       },
       {
         id: 3,
         author: 'Priya Sharma',
         avatar: '👩‍🎤',
-        content: 'World Cup Final: What an incredible match! The atmosphere was electric and the performance was absolutely spectacular. History in the making!',
+        content: 'World Cup Final: What an incredible match! The atmosphere was electric and the performance was absolutely spectacular.',
         timestamp: '5 hours ago',
         likes: 267,
         comments: 45,
@@ -110,45 +104,21 @@ const App = () => {
         id: 4,
         author: 'David Wilson',
         avatar: '👨‍🏫',
-        content: 'Election Update: Record voter turnout reported across key constituencies. Early results showing tight race in several critical districts.',
+        content: 'Election Update: Record voter turnout reported across key constituencies. Early results showing tight race in several districts.',
         timestamp: '6 hours ago',
         likes: 156,
         comments: 34,
         privacy: 'public',
         category: 'politics',
         isBreaking: true
-      },
-      {
-        id: 5,
-        author: 'Lisa Zhang',
-        avatar: '👩‍🎨',
-        content: 'Movie premiere review: The cinematography is breathtaking and the storyline captivating. This film will definitely be in the running for major awards.',
-        timestamp: '8 hours ago',
-        likes: 78,
-        comments: 23,
-        privacy: 'public',
-        category: 'entertainment'
-      },
-      {
-        id: 6,
-        author: 'Emma Wilson',
-        avatar: '👩‍🦱',
-        content: 'Celebrating our cultural heritage during festival season. Family traditions connecting generations and preserving our beautiful customs.',
-        timestamp: '1 day ago',
-        likes: 92,
-        comments: 15,
-        privacy: 'family',
-        category: 'culture',
-        relationship: 'Family Circle'
       }
     ]);
 
     setCommunities([
-      { id: 1, name: 'Global News Hub', members: 45672, description: 'Breaking news and current affairs worldwide', category: 'news', isJoined: true },
-      { id: 2, name: 'Tech Innovators', members: 23456, description: 'Latest in technology and innovation', category: 'technology', isJoined: true },
-      { id: 3, name: 'Sports Central', members: 67890, description: 'All sports coverage and discussions', category: 'sports', isJoined: false },
-      { id: 4, name: 'Political Forum', members: 12345, description: 'Civil political discourse and analysis', category: 'politics', isJoined: true },
-      { id: 5, name: 'Entertainment Today', members: 34567, description: 'Movies, music, and celebrity news', category: 'entertainment', isJoined: false }
+      { id: 1, name: 'Global News Hub', members: 45672, category: 'news', isJoined: true },
+      { id: 2, name: 'Tech Innovators', members: 23456, category: 'technology', isJoined: true },
+      { id: 3, name: 'Sports Central', members: 67890, category: 'sports', isJoined: false },
+      { id: 4, name: 'Political Forum', members: 12345, category: 'politics', isJoined: true }
     ]);
 
     setRelationships([
@@ -194,7 +164,7 @@ const App = () => {
 
   const getCategoryStyle = (categoryId) => {
     const category = categories.find(c => c.id === categoryId);
-    return category || { color: 'bg-gray-600', textColor: 'text-gray-600' };
+    return category || { color: 'bg-gray-600' };
   };
 
   const filteredPosts = activeCategory === 'all' 
@@ -217,7 +187,7 @@ const App = () => {
             <p className="text-gray-600 mb-8">Your trusted social news platform</p>
             <button 
               onClick={() => setCurrentUser({ id: 1, name: 'Demo User', avatar: '👤' })}
-              className="w-full bg-gradient-to-r from-red-600 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              className="w-full bg-gradient-to-r from-red-600 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300"
             >
               Enter Demo
             </button>
@@ -229,10 +199,9 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - BBC News Style */}
+      {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto">
-          {/* Top Navigation */}
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
             <div className="flex items-center space-x-4">
               <div className="bg-gradient-to-r from-red-600 to-gray-800 w-12 h-12 rounded-lg flex items-center justify-center">
@@ -251,20 +220,19 @@ const App = () => {
               </div>
             </div>
             
-            {/* Breaking News Ticker */}
             <div className="hidden lg:flex items-center bg-red-600 text-white px-4 py-2 rounded-full animate-pulse">
               <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
               <span className="font-bold text-sm">LIVE: Election Updates • Tech Summit • Sports Finals</span>
             </div>
 
             <div className="flex items-center space-x-3">
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl">
                 <Search className="w-6 h-6" />
               </button>
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl">
                 <Bell className="w-6 h-6" />
               </button>
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl">
                 <Settings className="w-6 h-6" />
               </button>
               <div className="w-10 h-10 bg-gradient-to-r from-red-600 to-gray-800 rounded-full flex items-center justify-center text-white font-bold">
@@ -273,14 +241,13 @@ const App = () => {
             </div>
           </div>
 
-          {/* Main Navigation */}
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center px-4 py-3">
             <div className="flex items-center space-x-1">
               {['home', 'communities', 'relationships'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-bold transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-bold transition-all ${
                     activeTab === tab
                       ? 'bg-red-600 text-white shadow-lg'
                       : 'text-gray-600 hover:bg-gray-100'
@@ -308,10 +275,10 @@ const App = () => {
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
                     isActive
-                      ? `${category.color} text-white shadow-lg transform scale-105`
-                      : `text-gray-600 hover:bg-gray-100 hover:${category.textColor}`
+                      ? `${category.color} text-white shadow-lg`
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -334,7 +301,6 @@ const App = () => {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === 'home' && (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Main Feed */}
             <div className="lg:col-span-3 space-y-6">
               {/* Category Header */}
               {activeCategory !== 'all' && (
@@ -366,7 +332,7 @@ const App = () => {
                       value={newPost}
                       onChange={(e) => setNewPost(e.target.value)}
                       placeholder="Share breaking news, insights, or updates..."
-                      className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-lg"
+                      className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-red-500"
                       rows="3"
                     />
                     <div className="flex items-center justify-between mt-4">
@@ -376,7 +342,7 @@ const App = () => {
                           <select
                             value={privacyLevel}
                             onChange={(e) => setPrivacyLevel(e.target.value)}
-                            className="border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500"
+                            className="border border-gray-200 rounded-lg px-3 py-2"
                           >
                             {privacyLevels.map(level => (
                               <option key={level.value} value={level.value}>
@@ -390,7 +356,7 @@ const App = () => {
                           <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500"
+                            className="border border-gray-200 rounded-lg px-3 py-2"
                           >
                             {categories.filter(c => c.id !== 'all').map(category => (
                               <option key={category.id} value={category.id}>
@@ -403,7 +369,7 @@ const App = () => {
                       <button
                         onClick={handleCreatePost}
                         disabled={!newPost.trim()}
-                        className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-8 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                        className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-8 py-3 rounded-xl font-bold disabled:opacity-50"
                       >
                         Post
                       </button>
@@ -412,13 +378,13 @@ const App = () => {
                 </div>
               </div>
 
-              {/* Posts Feed */}
+              {/* Posts */}
               {filteredPosts.map(post => {
                 const PrivacyIcon = getPrivacyIcon(post.privacy);
                 const categoryStyle = getCategoryStyle(post.category);
                 
                 return (
-                  <article key={post.id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                  <article key={post.id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div className="w-14 h-14 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
@@ -444,12 +410,6 @@ const App = () => {
                             <span className={`${categoryStyle.color} text-white px-2 py-1 rounded-lg text-xs font-bold`}>
                               {categories.find(c => c.id === post.category)?.name}
                             </span>
-                            {post.community && (
-                              <>
-                                <span>•</span>
-                                <span className="text-blue-600 font-medium">{post.community}</span>
-                              </>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -461,15 +421,15 @@ const App = () => {
                     <p className="text-gray-800 text-lg leading-relaxed mb-6">{post.content}</p>
                     
                     <div className="flex items-center space-x-8 pt-4 border-t border-gray-100">
-                      <button className="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors">
+                      <button className="flex items-center space-x-2 text-gray-600 hover:text-red-600">
                         <Heart className="w-6 h-6" />
                         <span className="font-bold text-lg">{post.likes}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                      <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600">
                         <MessageCircle className="w-6 h-6" />
                         <span className="font-bold text-lg">{post.comments}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
+                      <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600">
                         <Share className="w-6 h-6" />
                         <span className="font-bold">Share</span>
                       </button>
@@ -481,7 +441,6 @@ const App = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Trending Topics */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h3 className="font-bold text-gray-900 text-xl mb-4 flex items-center">
                   <TrendingUp className="w-6 h-6 mr-2 text-red-600" />
@@ -502,7 +461,6 @@ const App = () => {
                 </div>
               </div>
 
-              {/* Privacy Dashboard */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <h3 className="font-bold text-gray-900 text-xl mb-4 flex items-center">
                   <Shield className="w-6 h-6 mr-2 text-green-600" />
@@ -523,25 +481,6 @@ const App = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Your Communities */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="font-bold text-gray-900 text-xl mb-4">Your Communities</h3>
-                <div className="space-y-3">
-                  {filteredCommunities.filter(c => c.isJoined).map(community => (
-                    <div key={community.id} className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                      <div className={`w-10 h-10 ${getCategoryStyle(community.category).color} rounded-xl flex items-center justify-center`}>
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-900">{community.name}</p>
-                        <p className="text-sm text-gray-500">{community.members.toLocaleString()} members</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -551,7 +490,7 @@ const App = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-4xl font-bold text-gray-900">Communities</h2>
-              <button className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2">
+              <button className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2">
                 <Plus className="w-5 h-5" />
                 <span>Create Community</span>
               </button>
@@ -571,14 +510,13 @@ const App = () => {
                       </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 mb-4">{community.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-500 font-bold">{community.members.toLocaleString()} members</span>
                     <button 
-                      className={`px-6 py-2 rounded-xl font-bold transition-all duration-200 ${
+                      className={`px-6 py-2 rounded-xl font-bold ${
                         community.isJoined 
                           ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' 
-                          : 'bg-gradient-to-r from-red-600 to-gray-800 text-white hover:shadow-lg transform hover:scale-105'
+                          : 'bg-gradient-to-r from-red-600 to-gray-800 text-white'
                       }`}
                     >
                       {community.isJoined ? 'Joined' : 'Join'}
@@ -595,4 +533,86 @@ const App = () => {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-4xl font-bold text-gray-900">Relationship Hierarchy</h2>
-              <button className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2">
+              <button className="bg-gradient-to-r from-red-600 to-gray-800 text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2">
+                <Plus className="w-5 h-5" />
+                <span>Add Connection</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relationships.map(relationship => (
+                <div key={relationship.id} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                        {relationship.avatar}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-xl">{relationship.name}</h3>
+                        <span className="text-gray-600">{relationship.relationship}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {relationship.visibility === 'private' ? (
+                        <EyeOff className="w-5 h-5 text-gray-400" />
+                      ) : (
+                        <Eye className="w-5 h-5 text-blue-600" />
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Category:</span>
+                      <span className={`font-bold capitalize ${
+                        relationship.category === 'family' ? 'text-red-600' :
+                        relationship.category === 'friends' ? 'text-blue-600' :
+                        'text-purple-600'
+                      }`}>
+                        {relationship.category}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Visibility:</span>
+                      <span className="font-bold capitalize text-gray-800">
+                        {relationship.visibility}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <button className="w-full mt-6 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200">
+                    Edit Relationship
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
+        <div className="flex justify-around">
+          {[
+            { tab: 'home', icon: Home, label: 'Home' },
+            { tab: 'communities', icon: Users, label: 'Communities' },
+            { tab: 'relationships', icon: Heart, label: 'Relationships' }
+          ].map(({ tab, icon: Icon, label }) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex flex-col items-center space-y-1 py-2 px-4 ${
+                activeTab === tab ? 'text-red-600' : 'text-gray-400'
+              }`}
+            >
+              <Icon className="w-6 h-6" />
+              <span className="text-xs font-bold">{label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default App;
