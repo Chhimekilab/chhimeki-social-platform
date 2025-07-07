@@ -13,12 +13,19 @@ import {
   Video,
   Image,
   Crown,
-  MessageSquare
+  MessageSquare,
+  LogOut
 } from 'lucide-react';
+import AuthWrapper from './components/auth/AuthWrapper';
+import { useAuth } from './contexts/AuthContext';
+import WeatherWidget from './components/widgets/WeatherWidget';
+import TrendingTopicsWidget from './components/widgets/TrendingTopicsWidget';
+import QuickActionsWidget from './components/widgets/QuickActionsWidget';
+import ActivityFeedWidget from './components/widgets/ActivityFeedWidget';
 
 const App = () => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user: currentUser, logout } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -107,13 +114,6 @@ const App = () => {
       ];
 
       setPosts(demoPosts);
-      setCurrentUser({
-        id: 'demo_user_123',
-        full_name: 'Demo User',
-        subscription_tier: 'premium',
-        followers_count: 156,
-        following_count: 89
-      });
       setLoading(false);
     };
 
@@ -176,7 +176,8 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AuthWrapper>
+      <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -323,9 +324,19 @@ const App = () => {
                 )}
               </div>
               
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                  {getAvatarInitials(currentUser?.full_name)}
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={logout}
+                  className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {getAvatarInitials(currentUser?.full_name)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -402,6 +413,9 @@ const App = () => {
                 ))}
               </div>
             </div>
+
+            {/* Activity Feed Widget */}
+            <ActivityFeedWidget />
           </div>
 
           {/* Main Content */}
@@ -550,6 +564,15 @@ const App = () => {
                 </div>
               </div>
             </div>
+
+            {/* Quick Actions Widget */}
+            <QuickActionsWidget />
+
+            {/* Weather Widget */}
+            <WeatherWidget />
+
+            {/* Trending Topics Widget - Enhanced */}
+            <TrendingTopicsWidget />
 
             {/* People You May Know */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -763,6 +786,7 @@ const App = () => {
         )}
       </div>
     </div>
+    </AuthWrapper>
   );
 };
 
