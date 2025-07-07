@@ -22,6 +22,7 @@ import WeatherWidget from './components/widgets/WeatherWidget';
 import TrendingTopicsWidget from './components/widgets/TrendingTopicsWidget';
 import QuickActionsWidget from './components/widgets/QuickActionsWidget';
 import ActivityFeedWidget from './components/widgets/ActivityFeedWidget';
+import { FooterVersion } from './components/version/VersionInfo';
 
 const App = () => {
   const { user: currentUser, logout } = useAuth();
@@ -785,6 +786,13 @@ const App = () => {
           </div>
         )}
       </div>
+
+      {/* Footer with Version Info */}
+      <footer className="bg-gray-50 border-t border-gray-200 py-8 mt-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <FooterVersion />
+        </div>
+      </footer>
     </div>
     </AuthWrapper>
   );

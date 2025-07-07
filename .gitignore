@@ -61,3 +61,12 @@ docker-compose.override.yml
 # Temporary folders
 tmp/
 temp/
+
+# Version and release files
+.versionrc.local
+version-*.json
+release-notes-*.md
+.releaserc.local
+
+# Build artifacts
+build-info.json

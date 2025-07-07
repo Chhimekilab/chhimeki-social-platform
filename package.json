@@ -2,6 +2,8 @@
   "name": "chhimeki-social-platform",
   "version": "1.0.0",
   "private": true,
+  "description": "A modern social media platform with real-time features and community-focused interactions",
+  "author": "Chhimeki Team",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
     "lucide-react": "^0.263.1",
@@ -25,19 +27,42 @@
     "lint:fix": "eslint src/**/*.{js,jsx} --fix",
     "format": "prettier --write src/**/*.{js,jsx,css,md}",
     "format:check": "prettier --check src/**/*.{js,jsx,css,md}",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "version:check": "echo $npm_package_version",
+    "version:patch": "standard-version --release-as patch",
+    "version:minor": "standard-version --release-as minor",
+    "version:major": "standard-version --release-as major",
+    "version:prerelease": "standard-version --prerelease",
+    "version:beta": "standard-version --prerelease beta",
+    "version:alpha": "standard-version --prerelease alpha",
+    "version:first": "standard-version --first-release",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "changelog:all": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+    "release": "npm run lint && npm run test:ci && npm run version:patch",
+    "release:minor": "npm run lint && npm run test:ci && npm run version:minor",
+    "release:major": "npm run lint && npm run test:ci && npm run version:major",
+    "prebuild": "cross-env REACT_APP_VERSION=$npm_package_version npm run build",
+    "version:update": "node scripts/version-utils.js update",
+    "version:info": "node scripts/version-utils.js info",
+    "version:validate": "node scripts/version-utils.js validate",
+    "version:prepare": "node scripts/version-utils.js prepare",
+    "version:deploy": "node scripts/version-utils.js deploy",
+    "postversion": "npm run version:update"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
+    "conventional-changelog-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "standard-version": "^9.5.0"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +79,59 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "standard-version": {
+    "releaseCommitMessageFormat": "chore(release): {{currentTag}} [skip ci]",
+    "scripts": {
+      "prebump": "echo 'Preparing new release...'",
+      "postbump": "echo 'Version bumped to {{nextRelease.version}}'",
+      "prechangelog": "echo 'Generating changelog...'",
+      "postchangelog": "echo 'Changelog updated'",
+      "precommit": "echo 'Committing changes...'",
+      "posttag": "echo 'Release tagged: {{nextRelease.gitTag}}'"
+    },
+    "types": [
+      {
+        "type": "feat",
+        "section": "🚀 Features"
+      },
+      {
+        "type": "fix",
+        "section": "🐛 Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "⚡ Performance Improvements"
+      },
+      {
+        "type": "refactor",
+        "section": "♻️ Code Refactoring"
+      },
+      {
+        "type": "docs",
+        "section": "📚 Documentation"
+      },
+      {
+        "type": "style",
+        "section": "💄 Styles"
+      },
+      {
+        "type": "test",
+        "section": "✅ Tests"
+      },
+      {
+        "type": "build",
+        "section": "🏗️ Build System"
+      },
+      {
+        "type": "ci",
+        "section": "👷 CI"
+      },
+      {
+        "type": "chore",
+        "hidden": true
+      }
     ]
   }
 }
