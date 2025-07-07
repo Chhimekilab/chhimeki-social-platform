@@ -1,0 +1,8 @@
+node_modules
+build
+dist
+coverage
+.env*
+*.min.js
+*.min.css
+public/index.html

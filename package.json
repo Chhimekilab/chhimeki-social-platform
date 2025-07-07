@@ -10,12 +10,33 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:dev": "REACT_APP_ENV=development react-scripts start",
+    "start:test": "REACT_APP_ENV=test react-scripts start",
     "build": "react-scripts build",
+    "build:dev": "REACT_APP_ENV=development react-scripts build",
+    "build:test": "REACT_APP_ENV=test react-scripts build",
+    "build:prod": "REACT_APP_ENV=production react-scripts build",
     "test": "react-scripts test",
+    "test:watch": "react-scripts test --watch",
+    "test:coverage": "react-scripts test --coverage --verbose",
+    "test:ci": "CI=true react-scripts test --coverage --watchAll=false",
+    "lint": "eslint src/**/*.{js,jsx}",
+    "lint:fix": "eslint src/**/*.{js,jsx} --fix",
+    "format": "prettier --write src/**/*.{js,jsx,css,md}",
+    "format:check": "prettier --check src/**/*.{js,jsx,css,md}",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3"
   },
   "eslintConfig": {
     "extends": [
