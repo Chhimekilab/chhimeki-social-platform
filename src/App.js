@@ -31,8 +31,11 @@ import {
   Activity,
   Users2,
   Building,
-  Home
+  Home,
+  BarChart3
 } from 'lucide-react';
+import analyticsService from './services/analyticsService';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -270,13 +273,25 @@ const App = () => {
       ];
 
       setPosts(demoPosts);
-      setCurrentUser({
+      
+      const user = {
         id: 'demo_user_123',
         full_name: 'Demo User',
         subscription_tier: 'premium',
         followers_count: 156,
         following_count: 89
+      };
+      
+      setCurrentUser(user);
+      
+      // Initialize analytics with user information
+      analyticsService.setUserId(user.id);
+      analyticsService.trackPageView('app_loaded', {
+        userTier: user.subscription_tier,
+        followersCount: user.followers_count,
+        platform: 'web'
       });
+      
       setLoading(false);
     };
 
@@ -305,6 +320,14 @@ const App = () => {
       isPremium: currentUser.subscription_tier !== 'free'
     };
 
+    // Track post creation
+    analyticsService.trackPostCreated(
+      newPostData.id,
+      'text',
+      (postTitle + newPost).length,
+      false
+    );
+
     setPosts([newPostData, ...posts]);
     setNewPost('');
     setPostTitle('');
@@ -315,14 +338,26 @@ const App = () => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
         const isLiked = post.isLiked;
+        const newLikedState = !isLiked;
+        
+        // Track like/unlike action
+        analyticsService.trackPostLike(postId, post.author, newLikedState);
+        
         return {
           ...post,
           likes: isLiked ? post.likes - 1 : post.likes + 1,
-          isLiked: !isLiked
+          isLiked: newLikedState
         };
       }
       return post;
     }));
+  };
+
+  const handleTabSwitch = (newTab) => {
+    if (newTab !== activeTab) {
+      analyticsService.trackTabSwitch(activeTab, newTab);
+      setActiveTab(newTab);
+    }
   };
 
   if (loading) {
@@ -356,11 +391,12 @@ const App = () => {
                 { id: 'news', name: 'News', icon: Newspaper },
                 { id: 'trending', name: 'Trending', icon: TrendingUp },
                 { id: 'communities', name: 'Communities', icon: Users2 },
-                { id: 'neighborhood', name: 'Neighborhood', icon: MapPin }
+                { id: 'neighborhood', name: 'Neighborhood', icon: MapPin },
+                { id: 'analytics', name: 'Analytics', icon: BarChart3 }
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabSwitch(tab.id)}
                   className={`flex items-center space-x-1 font-medium transition-colors ${
                     activeTab === tab.id ? 'text-orange-600 border-b-2 border-orange-600 pb-4' : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -372,7 +408,12 @@ const App = () => {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <button className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all">
+              <button 
+                onClick={() => {
+                  analyticsService.trackPremiumFeatureView('upgrade_button_header');
+                }}
+                className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all"
+              >
                 <Crown className="w-4 h-4" />
                 <span>Upgrade</span>
               </button>
@@ -391,7 +432,12 @@ const App = () => {
                       <input
                         type="text"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          if (e.target.value.length > 2) {
+                            analyticsService.trackSearch(e.target.value, 0); // In real app, you'd have actual results
+                          }
+                        }}
                         placeholder="Search people, posts, communities..."
                         className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         autoFocus
@@ -417,7 +463,12 @@ const App = () => {
               {/* Enhanced Notifications */}
               <div className="relative">
                 <button 
-                  onClick={() => setShowNotifications(!showNotifications)}
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    analyticsService.trackEvent('notifications_panel_toggle', { 
+                      action: !showNotifications ? 'open' : 'close' 
+                    });
+                  }}
                   className="p-2 text-gray-600 hover:text-gray-900 relative transition-colors"
                 >
                   <Bell className="w-5 h-5" />
@@ -432,7 +483,13 @@ const App = () => {
                     </div>
                     <div className="divide-y divide-gray-100">
                       {notifications.map(notification => (
-                        <div key={notification.id} className={`p-4 hover:bg-gray-50 ${!notification.read ? 'bg-orange-50' : ''}`}>
+                        <div 
+                          key={notification.id} 
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${!notification.read ? 'bg-orange-50' : ''}`}
+                          onClick={() => {
+                            analyticsService.trackNotificationClick(notification.id, notification.type, 'view');
+                          }}
+                        >
                           <div className="flex items-start space-x-3">
                             <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-medium">
                               {notification.user.split(' ').map(n => n[0]).join('')}
@@ -457,7 +514,12 @@ const App = () => {
               {/* Messages */}
               <div className="relative">
                 <button 
-                  onClick={() => setShowMessages(!showMessages)}
+                  onClick={() => {
+                    setShowMessages(!showMessages);
+                    analyticsService.trackEvent('messages_panel_toggle', { 
+                      action: !showMessages ? 'open' : 'close' 
+                    });
+                  }}
                   className="p-2 text-gray-600 hover:text-gray-900 relative transition-colors"
                 >
                   <MessageSquare className="w-5 h-5" />
@@ -472,7 +534,13 @@ const App = () => {
                     </div>
                     <div className="divide-y divide-gray-100">
                       {messages.map(message => (
-                        <div key={message.id} className={`p-4 hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-orange-50' : ''}`}>
+                        <div 
+                          key={message.id} 
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-orange-50' : ''}`}
+                          onClick={() => {
+                            analyticsService.trackMessage(message.user, 'view', message.message.length);
+                          }}
+                        >
                           <div className="flex items-start space-x-3">
                             <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-medium">
                               {message.user.split(' ').map(n => n[0]).join('')}
@@ -610,7 +678,11 @@ const App = () => {
                     {newsCategories.map((category) => (
                       <button
                         key={category.id}
-                        onClick={() => setSelectedNewsCategory(category.id)}
+                        onClick={() => {
+                          const previousCategory = selectedNewsCategory;
+                          setSelectedNewsCategory(category.id);
+                          analyticsService.trackCategoryFilter(category.id, previousCategory);
+                        }}
                         className={`flex items-center space-x-2 px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
                           selectedNewsCategory === category.id
                             ? 'bg-orange-500 text-white'
@@ -629,7 +701,13 @@ const App = () => {
                   {trendingNews
                     .filter(news => selectedNewsCategory === 'all' || news.category === selectedNewsCategory)
                     .map(news => (
-                      <div key={news.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                      <div 
+                        key={news.id} 
+                        className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                        onMouseEnter={() => {
+                          analyticsService.trackNewsArticleView(news.id, news.category, news.source, 0);
+                        }}
+                      >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center space-x-2">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -661,16 +739,38 @@ const App = () => {
                               <Eye className="w-4 h-4" />
                               <span className="text-sm">{news.engagement}</span>
                             </span>
-                            <button className="flex items-center space-x-1 text-gray-500 hover:text-orange-600 transition-colors">
+                            <button 
+                              onClick={() => {
+                                analyticsService.trackEvent('news_article_like', { 
+                                  articleId: news.id, 
+                                  category: news.category 
+                                });
+                              }}
+                              className="flex items-center space-x-1 text-gray-500 hover:text-orange-600 transition-colors"
+                            >
                               <Heart className="w-4 h-4" />
                               <span className="text-sm">Like</span>
                             </button>
-                            <button className="flex items-center space-x-1 text-gray-500 hover:text-blue-600 transition-colors">
+                            <button 
+                              onClick={() => {
+                                analyticsService.trackNewsArticleShare(news.id, news.category, news.source, 'social_share');
+                              }}
+                              className="flex items-center space-x-1 text-gray-500 hover:text-blue-600 transition-colors"
+                            >
                               <Share className="w-4 h-4" />
                               <span className="text-sm">Share</span>
                             </button>
                           </div>
-                          <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors">
+                          <button 
+                            onClick={() => {
+                              analyticsService.trackEvent('news_article_read_more', { 
+                                articleId: news.id, 
+                                category: news.category,
+                                source: news.source 
+                              });
+                            }}
+                            className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors"
+                          >
                             <ExternalLink className="w-4 h-4" />
                             <span className="text-sm font-medium">Read More</span>
                           </button>
@@ -695,7 +795,16 @@ const App = () => {
                     </div>
                     <div className="space-y-3">
                       {externalTrending.twitter.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div 
+                          key={index} 
+                          className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          onClick={() => {
+                            analyticsService.trackTrendingItemClick(item.hashtag, 'twitter', 'hashtag', index + 1);
+                          }}
+                          onMouseEnter={() => {
+                            analyticsService.trackTrendingItemView(item.hashtag, 'twitter', 'hashtag', index + 1);
+                          }}
+                        >
                           <span className="font-medium text-blue-600">{item.hashtag}</span>
                           <span className="text-sm text-gray-500">{item.posts}</span>
                         </div>
@@ -712,7 +821,16 @@ const App = () => {
                     </div>
                     <div className="space-y-3">
                       {externalTrending.facebook.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div 
+                          key={index} 
+                          className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          onClick={() => {
+                            analyticsService.trackTrendingItemClick(item.topic, 'facebook', 'topic', index + 1);
+                          }}
+                          onMouseEnter={() => {
+                            analyticsService.trackTrendingItemView(item.topic, 'facebook', 'topic', index + 1);
+                          }}
+                        >
                           <span className="font-medium text-gray-900">{item.topic}</span>
                           <span className="text-sm text-gray-500">{item.engagement}</span>
                         </div>
@@ -729,7 +847,16 @@ const App = () => {
                     </div>
                     <div className="space-y-3">
                       {externalTrending.tiktok.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div 
+                          key={index} 
+                          className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          onClick={() => {
+                            analyticsService.trackTrendingItemClick(item.trend, 'tiktok', 'trend', index + 1);
+                          }}
+                          onMouseEnter={() => {
+                            analyticsService.trackTrendingItemView(item.trend, 'tiktok', 'trend', index + 1);
+                          }}
+                        >
                           <span className="font-medium text-gray-900">{item.trend}</span>
                           <span className="text-sm text-gray-500">{item.views}</span>
                         </div>
@@ -746,7 +873,16 @@ const App = () => {
                     </div>
                     <div className="space-y-3">
                       {externalTrending.instagram.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                        <div 
+                          key={index} 
+                          className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          onClick={() => {
+                            analyticsService.trackTrendingItemClick(item.content, 'instagram', 'content', index + 1);
+                          }}
+                          onMouseEnter={() => {
+                            analyticsService.trackTrendingItemView(item.content, 'instagram', 'content', index + 1);
+                          }}
+                        >
                           <span className="font-medium text-gray-900">{item.content}</span>
                           <span className="text-sm text-gray-500">{item.likes}</span>
                         </div>
@@ -819,7 +955,10 @@ const App = () => {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-900">Communities</h2>
                     <button 
-                      onClick={() => setShowCreateCommunity(true)}
+                      onClick={() => {
+                        setShowCreateCommunity(true);
+                        analyticsService.trackEvent('community_create_button_clicked');
+                      }}
                       className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                     >
                       Create Community
@@ -847,10 +986,20 @@ const App = () => {
                           )}
                         </div>
                         <div className="flex space-x-2">
-                          <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded font-medium transition-colors">
+                          <button 
+                            onClick={() => {
+                              analyticsService.trackCommunityJoin(community.id, community.name, 'browse');
+                            }}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded font-medium transition-colors"
+                          >
                             Join
                           </button>
-                          <button className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded font-medium transition-colors">
+                          <button 
+                            onClick={() => {
+                              analyticsService.trackEvent('community_view_clicked', { communityId: community.id });
+                            }}
+                            className="flex-1 border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded font-medium transition-colors"
+                          >
                             View
                           </button>
                         </div>
@@ -859,6 +1008,11 @@ const App = () => {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Analytics Tab */}
+            {activeTab === 'analytics' && (
+              <AnalyticsDashboard currentUser={currentUser} />
             )}
 
             {/* Create Post - Only on Home Tab */}
@@ -888,14 +1042,20 @@ const App = () => {
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center space-x-4">
                         <button 
-                          onClick={() => setShowMediaUpload(true)}
+                          onClick={() => {
+                            setShowMediaUpload(true);
+                            analyticsService.trackEvent('media_upload_intent', { mediaType: 'photo' });
+                          }}
                           className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors"
                         >
                           <Image className="w-5 h-5" />
                           <span>Photo</span>
                         </button>
                         <button 
-                          onClick={() => setShowMediaUpload(true)}
+                          onClick={() => {
+                            setShowMediaUpload(true);
+                            analyticsService.trackEvent('media_upload_intent', { mediaType: 'video' });
+                          }}
                           className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors"
                         >
                           <Video className="w-5 h-5" />
@@ -926,12 +1086,18 @@ const App = () => {
             {/* Posts Feed - Only on Home Tab */}
             {activeTab === 'home' && (
               <div className="space-y-8">
-                {posts.map(post => (
-                <article key={post.id} className="bg-white border border-gray-200 rounded-lg p-6">
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-medium">
-                      {post.avatar}
-                    </div>
+                                {posts.map(post => (
+                  <article 
+                    key={post.id} 
+                    className="bg-white border border-gray-200 rounded-lg p-6"
+                    onMouseEnter={() => {
+                      analyticsService.trackPostView(post.id, post.author, 'text');
+                    }}
+                  >
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-medium">
+                        {post.avatar}
+                      </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h3 className="font-medium text-gray-900">{post.author}</h3>
@@ -962,11 +1128,21 @@ const App = () => {
                         <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
                         <span className="font-medium">{post.likes}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
+                      <button 
+                        onClick={() => {
+                          analyticsService.trackPostComment(post.id, post.author, 0); // 0 as placeholder for comment length
+                        }}
+                        className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors"
+                      >
                         <MessageSquare className="w-5 h-5" />
                         <span className="font-medium">{post.comments}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
+                      <button 
+                        onClick={() => {
+                          analyticsService.trackPostShare(post.id, post.author, 'direct_link');
+                        }}
+                        className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors"
+                      >
                         <Share className="w-5 h-5" />
                         <span className="font-medium">Share</span>
                       </button>
@@ -1110,7 +1286,12 @@ const App = () => {
                   <li>• Advanced analytics</li>
                   <li>• Exclusive community access</li>
                 </ul>
-                <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all">
+                <button 
+                  onClick={() => {
+                    analyticsService.trackPremiumUpgrade('free', 'premium', 'sidebar_cta');
+                  }}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-4 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 transition-all"
+                >
                   Upgrade Now
                 </button>
               </div>
