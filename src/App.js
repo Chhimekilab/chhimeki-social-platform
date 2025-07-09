@@ -16,7 +16,8 @@ import {
   MessageSquare,
   LogOut,
   Home,
-  Eye
+  Eye,
+  MessageCircle
 } from 'lucide-react';
 import AuthWrapper from './components/auth/AuthWrapper';
 import { useAuth } from './contexts/AuthContext';
@@ -27,6 +28,8 @@ import ActivityFeedWidget from './components/widgets/ActivityFeedWidget';
 import { FooterVersion } from './components/version/VersionInfo';
 import AIDashboard from './components/ai/AIDashboard';
 import DigestViewer from './components/subscriptions/DigestViewer';
+import ChatInterface from './components/chat/ChatInterface';
+import ChatRooms from './components/chat/ChatRooms';
 
 const App = () => {
   const { user: currentUser, logout } = useAuth();
@@ -48,6 +51,12 @@ const App = () => {
   const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [selectedDigest, setSelectedDigest] = useState(null);
   const [showDigestViewer, setShowDigestViewer] = useState(false);
+  
+  // Chat system state
+  const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showChatRooms, setShowChatRooms] = useState(false);
+  const [activeChatRoom, setActiveChatRoom] = useState(null);
+  const [unreadChatMessages, setUnreadChatMessages] = useState(3);
   
   // Refs for click-outside detection
   const notificationsRef = useRef(null);
@@ -93,8 +102,10 @@ const App = () => {
   const notifications = [
     { id: 1, type: 'like', user: 'Sarah Chen', content: 'liked your post about privacy', time: '2m ago', read: false },
     { id: 2, type: 'follow', user: 'Alex Rodriguez', content: 'started following you', time: '1h ago', read: false },
-    { id: 3, type: 'comment', user: 'Tech Insider', content: 'commented on your post', time: '3h ago', read: true },
-    { id: 4, type: 'mention', user: 'Maya Patel', content: 'mentioned you in a post', time: '1d ago', read: true }
+    { id: 3, type: 'chat', user: 'Anonymous User', content: 'wants to chat with you', time: '5m ago', read: false },
+    { id: 4, type: 'chat_room', user: 'Tech Community', content: 'new messages in Tech Talk room', time: '15m ago', read: false },
+    { id: 5, type: 'comment', user: 'Tech Insider', content: 'commented on your post', time: '3h ago', read: true },
+    { id: 6, type: 'mention', user: 'Maya Patel', content: 'mentioned you in a post', time: '1d ago', read: true }
   ];
   
   const messages = [
@@ -262,6 +273,35 @@ const App = () => {
     setShowNotifications(false);
     setShowMessages(false);
     setShowSearchResults(false);
+    setShowChatRooms(false);
+    setShowChatInterface(false);
+  };
+
+  // Chat system handlers
+  const handleOpenRandomChat = () => {
+    setShowChatInterface(true);
+    setShowChatRooms(false);
+    setActiveChatRoom(null);
+  };
+
+  const handleOpenChatRooms = () => {
+    setShowChatRooms(true);
+    setShowChatInterface(false);
+  };
+
+  const handleJoinChatRoom = (room) => {
+    setActiveChatRoom(room);
+    setShowChatRooms(false);
+    setShowChatInterface(true);
+  };
+
+  const handleCloseChatInterface = () => {
+    setShowChatInterface(false);
+    setActiveChatRoom(null);
+  };
+
+  const handleCloseChatRooms = () => {
+    setShowChatRooms(false);
   };
 
   // Digest viewing handlers
@@ -405,6 +445,31 @@ const App = () => {
               >
                 <Bell className="w-4 h-4" />
                 <span className="hidden sm:inline">Subscriptions</span>
+              </button>
+
+              {/* Live Chat Button */}
+              <div className="relative">
+                <button 
+                  onClick={handleOpenChatRooms}
+                  className="flex items-center space-x-1 bg-gradient-to-r from-green-500 to-teal-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-green-600 hover:to-teal-600 transition-all"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">Live Chat</span>
+                </button>
+                {unreadChatMessages > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {unreadChatMessages}
+                  </span>
+                )}
+              </div>
+
+              {/* Random Chat Quick Button */}
+              <button 
+                onClick={handleOpenRandomChat}
+                className="p-2 text-gray-600 hover:text-green-600 transition-colors relative"
+                title="Start Random Chat"
+              >
+                <Users className="w-5 h-5" />
               </button>
               
               {/* Enhanced Search */}
@@ -814,6 +879,32 @@ const App = () => {
             {/* Weather Widget */}
             <WeatherWidget />
 
+            {/* Live Chat Widget */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-4 flex items-center space-x-2">
+                <MessageCircle className="w-5 h-5 text-green-500" />
+                <span>Live Chat</span>
+              </h3>
+              <div className="space-y-3">
+                <button
+                  onClick={handleOpenRandomChat}
+                  className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white py-2 px-4 rounded-lg font-medium transition-all"
+                >
+                  Chat with Strangers
+                </button>
+                <button
+                  onClick={handleOpenChatRooms}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                >
+                  Join Chat Rooms
+                </button>
+                <div className="flex items-center justify-between text-sm text-gray-600 pt-2 border-t border-gray-100">
+                  <span>🌍 Global users online:</span>
+                  <span className="font-medium text-green-600">12,847</span>
+                </div>
+              </div>
+            </div>
+
             {/* Trending Topics Widget - Enhanced */}
             <TrendingTopicsWidget />
 
@@ -1130,13 +1221,28 @@ const App = () => {
           </div>
         )}
 
-        {showDigestViewer && selectedDigest && (
-          <DigestViewer
-            subscription={selectedDigest}
-            onClose={handleCloseDigestViewer}
-            onViewFullDigest={handleViewDigest}
-          />
-        )}
+                 {showDigestViewer && selectedDigest && (
+           <DigestViewer
+             subscription={selectedDigest}
+             onClose={handleCloseDigestViewer}
+             onViewFullDigest={handleViewDigest}
+           />
+         )}
+
+         {/* Chat System Components */}
+         {showChatInterface && (
+           <ChatInterface
+             activeChatRoom={activeChatRoom}
+             onClose={handleCloseChatInterface}
+           />
+         )}
+
+         {showChatRooms && (
+           <ChatRooms
+             onJoinRoom={handleJoinChatRoom}
+             onClose={handleCloseChatRooms}
+           />
+         )}
       </div>
 
       {/* Footer with Version Info */}
