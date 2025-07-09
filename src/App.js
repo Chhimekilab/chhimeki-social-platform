@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, 
   Search, 
@@ -14,7 +14,8 @@ import {
   Image,
   Crown,
   MessageSquare,
-  LogOut
+  LogOut,
+  Home
 } from 'lucide-react';
 import AuthWrapper from './components/auth/AuthWrapper';
 import { useAuth } from './contexts/AuthContext';
@@ -41,6 +42,11 @@ const App = () => {
   const [showPeopleYouMayKnow, setShowPeopleYouMayKnow] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  // Refs for click-outside detection
+  const notificationsRef = useRef(null);
+  const messagesRef = useRef(null);
+  const searchRef = useRef(null);
   
   const notifications = [
     { id: 1, type: 'like', user: 'Sarah Chen', content: 'liked your post about privacy', time: '2m ago', read: false },
@@ -122,6 +128,49 @@ const App = () => {
     initializeApp();
   }, []);
 
+  // Click outside detection
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+      if (messagesRef.current && !messagesRef.current.contains(event.target)) {
+        setShowMessages(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle notification clicks
+  const handleNotificationClick = (notificationId) => {
+    // Mark notification as read and close dropdown
+    setShowNotifications(false);
+    // Here you could add logic to mark the notification as read
+  };
+
+  // Handle message clicks
+  const handleMessageClick = (messageId) => {
+    // Mark message as read and close dropdown
+    setShowMessages(false);
+    // Here you could add logic to open the message thread
+  };
+
+  // Handle tab switching with better home navigation
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    // Close any open dropdowns when switching tabs
+    setShowNotifications(false);
+    setShowMessages(false);
+    setShowSearchResults(false);
+  };
+
   const getAvatarInitials = (name) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -184,25 +233,41 @@ const App = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">Chhimeki</h1>
+              <button
+                onClick={() => handleTabSwitch('home')}
+                className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+              >
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">Chhimeki</h1>
+              </button>
             </div>
 
             <nav className="hidden md:flex items-center space-x-8">
               {['home', 'trending', 'communities', 'relationships', 'ai-dashboard'].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`font-medium transition-colors ${
+                  onClick={() => handleTabSwitch(tab)}
+                  className={`font-medium transition-colors flex items-center space-x-1 ${
                     activeTab === tab ? 'text-orange-600 border-b-2 border-orange-600 pb-4' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab === 'ai-dashboard' ? '🤖 AI Dashboard' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'home' && <Home className="w-4 h-4" />}
+                  <span>{tab === 'ai-dashboard' ? '🤖 AI Dashboard' : tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
                 </button>
               ))}
             </nav>
+
+            {/* Mobile Home Button */}
+            <button
+              onClick={() => handleTabSwitch('home')}
+              className={`md:hidden p-2 rounded-lg transition-colors ${
+                activeTab === 'home' ? 'text-orange-600 bg-orange-50' : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Home className="w-5 h-5" />
+            </button>
 
             <div className="flex items-center space-x-4">
               <button className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all">
@@ -211,7 +276,7 @@ const App = () => {
               </button>
               
               {/* Enhanced Search */}
-              <div className="relative">
+              <div className="relative" ref={searchRef}>
                 <button 
                   onClick={() => setShowSearchResults(!showSearchResults)}
                   className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -221,6 +286,15 @@ const App = () => {
                 {showSearchResults && (
                   <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                     <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-medium text-gray-900">Search</h3>
+                        <button 
+                          onClick={() => setShowSearchResults(false)}
+                          className="p-1 text-gray-400 hover:text-gray-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                       <input
                         type="text"
                         value={searchQuery}
@@ -232,11 +306,17 @@ const App = () => {
                       <div className="mt-4 space-y-3">
                         <div className="text-sm font-medium text-gray-700">Recent Searches</div>
                         <div className="space-y-2">
-                          <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                          <div 
+                            onClick={() => setShowSearchResults(false)}
+                            className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          >
                             <Clock className="w-4 h-4 text-gray-400" />
                             <span className="text-sm">Tech trends 2025</span>
                           </div>
-                          <div className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                          <div 
+                            onClick={() => setShowSearchResults(false)}
+                            className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                          >
                             <Clock className="w-4 h-4 text-gray-400" />
                             <span className="text-sm">Sarah Chen</span>
                           </div>
@@ -259,13 +339,23 @@ const App = () => {
                   )}
                 </button>
                 {showNotifications && (
-                  <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                    <div className="p-4 border-b border-gray-200">
+                  <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto" ref={notificationsRef}>
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
                       <h3 className="font-medium text-gray-900">Notifications</h3>
+                      <button 
+                        onClick={() => setShowNotifications(false)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                     <div className="divide-y divide-gray-100">
                       {notifications.map(notification => (
-                        <div key={notification.id} className={`p-4 hover:bg-gray-50 ${!notification.read ? 'bg-orange-50' : ''}`}>
+                        <div 
+                          key={notification.id} 
+                          onClick={() => handleNotificationClick(notification.id)}
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${!notification.read ? 'bg-orange-50' : ''}`}
+                        >
                           <div className="flex items-start space-x-3">
                             <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-medium">
                               {notification.user.split(' ').map(n => n[0]).join('')}
@@ -299,13 +389,23 @@ const App = () => {
                   )}
                 </button>
                 {showMessages && (
-                  <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-                    <div className="p-4 border-b border-gray-200">
+                  <div className="absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto" ref={messagesRef}>
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
                       <h3 className="font-medium text-gray-900">Messages</h3>
+                      <button 
+                        onClick={() => setShowMessages(false)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                     <div className="divide-y divide-gray-100">
                       {messages.map(message => (
-                        <div key={message.id} className={`p-4 hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-orange-50' : ''}`}>
+                        <div 
+                          key={message.id} 
+                          onClick={() => handleMessageClick(message.id)}
+                          className={`p-4 hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-orange-50' : ''}`}
+                        >
                           <div className="flex items-start space-x-3">
                             <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-medium">
                               {message.user.split(' ').map(n => n[0]).join('')}
