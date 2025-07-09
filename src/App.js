@@ -15,7 +15,8 @@ import {
   Crown,
   MessageSquare,
   LogOut,
-  Home
+  Home,
+  Eye
 } from 'lucide-react';
 import AuthWrapper from './components/auth/AuthWrapper';
 import { useAuth } from './contexts/AuthContext';
@@ -25,6 +26,7 @@ import QuickActionsWidget from './components/widgets/QuickActionsWidget';
 import ActivityFeedWidget from './components/widgets/ActivityFeedWidget';
 import { FooterVersion } from './components/version/VersionInfo';
 import AIDashboard from './components/ai/AIDashboard';
+import DigestViewer from './components/subscriptions/DigestViewer';
 
 const App = () => {
   const { user: currentUser, logout } = useAuth();
@@ -42,11 +44,51 @@ const App = () => {
   const [showPeopleYouMayKnow, setShowPeopleYouMayKnow] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [userSubscriptions, setUserSubscriptions] = useState([]);
+  const [selectedDigest, setSelectedDigest] = useState(null);
+  const [showDigestViewer, setShowDigestViewer] = useState(false);
   
   // Refs for click-outside detection
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
   const searchRef = useRef(null);
+
+  // Available topics for subscription
+  const availableTopics = [
+    { id: 'politics', name: 'Politics', icon: '🏛️', description: 'Political news and analysis' },
+    { id: 'technology', name: 'Technology', icon: '💻', description: 'Tech trends and innovations' },
+    { id: 'business', name: 'Business', icon: '💼', description: 'Business news and market updates' },
+    { id: 'science', name: 'Science', icon: '🔬', description: 'Scientific discoveries and research' },
+    { id: 'health', name: 'Health', icon: '🏥', description: 'Health news and medical breakthroughs' },
+    { id: 'environment', name: 'Environment', icon: '🌱', description: 'Climate and environmental news' },
+    { id: 'sports', name: 'Sports', icon: '⚽', description: 'Sports news and updates' },
+    { id: 'entertainment', name: 'Entertainment', icon: '🎬', description: 'Movies, TV, and celebrity news' },
+    { id: 'finance', name: 'Finance', icon: '💰', description: 'Financial markets and cryptocurrency' },
+    { id: 'education', name: 'Education', icon: '📚', description: 'Educational news and resources' },
+    { id: 'travel', name: 'Travel', icon: '✈️', description: 'Travel guides and destination news' },
+    { id: 'food', name: 'Food & Dining', icon: '🍽️', description: 'Food trends and restaurant news' }
+  ];
+
+  // Sample user subscriptions (in real app, this would come from backend)
+  const defaultSubscriptions = [
+    { 
+      id: 'sub_1', 
+      topicId: 'technology', 
+      frequency: 'daily', 
+      enabled: true,
+      lastDigest: '2024-01-15T10:00:00Z',
+      nextDigest: '2024-01-16T10:00:00Z'
+    },
+    { 
+      id: 'sub_2', 
+      topicId: 'business', 
+      frequency: 'weekly', 
+      enabled: true,
+      lastDigest: '2024-01-10T09:00:00Z',
+      nextDigest: '2024-01-17T09:00:00Z'
+    }
+  ];
   
   const notifications = [
     { id: 1, type: 'like', user: 'Sarah Chen', content: 'liked your post about privacy', time: '2m ago', read: false },
@@ -122,11 +164,62 @@ const App = () => {
       ];
 
       setPosts(demoPosts);
+      setUserSubscriptions(defaultSubscriptions);
       setLoading(false);
     };
 
     initializeApp();
   }, []);
+
+  // Subscription management functions
+  const handleSubscribe = (topicId, frequency = 'weekly') => {
+    const newSubscription = {
+      id: 'sub_' + Date.now(),
+      topicId,
+      frequency,
+      enabled: true,
+      lastDigest: null,
+      nextDigest: getNextDigestDate(frequency)
+    };
+    
+    setUserSubscriptions(prev => [...prev, newSubscription]);
+  };
+
+  const handleUnsubscribe = (subscriptionId) => {
+    setUserSubscriptions(prev => prev.filter(sub => sub.id !== subscriptionId));
+  };
+
+  const handleUpdateSubscription = (subscriptionId, updates) => {
+    setUserSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === subscriptionId 
+          ? { ...sub, ...updates, nextDigest: getNextDigestDate(updates.frequency || sub.frequency) }
+          : sub
+      )
+    );
+  };
+
+  const getNextDigestDate = (frequency) => {
+    const now = new Date();
+    switch (frequency) {
+      case 'daily':
+        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+      case 'weekly':
+        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      case 'monthly':
+        return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      default:
+        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    }
+  };
+
+  const isSubscribed = (topicId) => {
+    return userSubscriptions.some(sub => sub.topicId === topicId && sub.enabled);
+  };
+
+  const getSubscription = (topicId) => {
+    return userSubscriptions.find(sub => sub.topicId === topicId && sub.enabled);
+  };
 
   // Click outside detection
   useEffect(() => {
@@ -169,6 +262,36 @@ const App = () => {
     setShowNotifications(false);
     setShowMessages(false);
     setShowSearchResults(false);
+  };
+
+  // Digest viewing handlers
+  const handleViewDigest = (subscription) => {
+    setSelectedDigest(subscription);
+    setShowDigestViewer(true);
+    setShowSubscriptionModal(false);
+  };
+
+  const handleCloseDigestViewer = () => {
+    setShowDigestViewer(false);
+    setSelectedDigest(null);
+  };
+
+  // Enhanced subscription management
+  const handleSubscribeWithDigest = async (topicId, frequency = 'weekly') => {
+    handleSubscribe(topicId, frequency);
+    // Auto-generate first digest
+    const subscription = {
+      topicId,
+      frequency,
+      enabled: true
+    };
+    
+    // Show the digest preview
+    setTimeout(() => {
+      setSelectedDigest(subscription);
+      setShowDigestViewer(true);
+      setShowSubscriptionModal(false);
+    }, 500);
   };
 
   const getAvatarInitials = (name) => {
@@ -273,6 +396,15 @@ const App = () => {
               <button className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all">
                 <Crown className="w-4 h-4" />
                 <span>Upgrade</span>
+              </button>
+              
+              {/* Subscription Button */}
+              <button 
+                onClick={() => setShowSubscriptionModal(true)}
+                className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-blue-600 hover:to-purple-600 transition-all"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="hidden sm:inline">Subscriptions</span>
               </button>
               
               {/* Enhanced Search */}
@@ -800,6 +932,107 @@ const App = () => {
         </div>
 
         {/* Modals */}
+        {showSubscriptionModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Manage Subscriptions</h2>
+                <button 
+                  onClick={() => setShowSubscriptionModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-600">Subscribe to topics you're interested in and receive AI-generated digests based on your preferred frequency.</p>
+              </div>
+
+              {/* Current Subscriptions */}
+              {userSubscriptions.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Active Subscriptions</h3>
+                  <div className="space-y-3">
+                    {userSubscriptions.map(subscription => {
+                      const topic = availableTopics.find(t => t.id === subscription.topicId);
+                      if (!topic) return null;
+                      
+                      return (
+                        <div key={subscription.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-2xl">{topic.icon}</span>
+                            <div>
+                              <h4 className="font-medium text-gray-900">{topic.name}</h4>
+                              <p className="text-sm text-gray-600">{topic.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <select 
+                              value={subscription.frequency}
+                              onChange={(e) => handleUpdateSubscription(subscription.id, { frequency: e.target.value })}
+                              className="px-3 py-1 border border-gray-300 rounded text-sm"
+                            >
+                              <option value="daily">Daily</option>
+                              <option value="weekly">Weekly</option>
+                              <option value="monthly">Monthly</option>
+                            </select>
+                            <button
+                              onClick={() => handleViewDigest(subscription)}
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors flex items-center space-x-1"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>View Digest</span>
+                            </button>
+                            <button
+                              onClick={() => handleUnsubscribe(subscription.id)}
+                              className="text-red-600 hover:text-red-800 text-sm font-medium"
+                            >
+                              Unsubscribe
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Available Topics */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Topics</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {availableTopics.map(topic => (
+                    <div key={topic.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">{topic.icon}</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{topic.name}</h4>
+                          <p className="text-sm text-gray-600">{topic.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {isSubscribed(topic.id) ? (
+                          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                            Subscribed
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleSubscribeWithDigest(topic.id, 'weekly')}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Subscribe
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showCreateCommunity && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl max-w-md w-full p-6">
@@ -895,6 +1128,14 @@ const App = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {showDigestViewer && selectedDigest && (
+          <DigestViewer
+            subscription={selectedDigest}
+            onClose={handleCloseDigestViewer}
+            onViewFullDigest={handleViewDigest}
+          />
         )}
       </div>
 
