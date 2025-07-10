@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, Users, ArrowRight, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Users, ArrowRight, Loader2, Info, Star } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, demoUsers } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [showDemoUsers, setShowDemoUsers] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,16 +56,29 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
     }
   };
 
-  const handleDemoLogin = async () => {
-    const result = await login('demo@chhimeki.com', 'demo123');
+  const handleDemoLogin = async (email, password) => {
+    const result = await login(email, password);
     if (!result.success) {
       setFormErrors({ submit: result.error });
     }
   };
 
+  const quickFillDemo = (email, password) => {
+    setFormData({ email, password });
+    setShowDemoUsers(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Beta Badge */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium shadow-lg">
+            <Star className="w-4 h-4 mr-2" />
+            Beta Version
+          </div>
+        </div>
+
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -72,6 +86,19 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to your Chhimeki account</p>
+        </div>
+
+        {/* Beta Notice */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-medium text-blue-900 mb-1">Beta Testing Phase</h3>
+              <p className="text-sm text-blue-700">
+                Welcome to Chhimeki Beta! Use demo accounts to explore all features.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Login Form */}
@@ -185,15 +212,58 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
               )}
             </button>
 
-            {/* Demo Login */}
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Try Demo Account
-            </button>
+            {/* Demo Accounts Section */}
+            <div className="space-y-3">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or try demo accounts</span>
+                </div>
+              </div>
+
+              {/* Quick Demo Login */}
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('demo@chhimeki.com', 'demo123')}
+                disabled={loading}
+                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Quick Demo Login
+              </button>
+
+              {/* Show More Demo Users */}
+              <button
+                type="button"
+                onClick={() => setShowDemoUsers(!showDemoUsers)}
+                className="w-full text-sm text-orange-600 hover:text-orange-700 font-medium"
+              >
+                {showDemoUsers ? 'Hide' : 'Show'} All Demo Users
+              </button>
+
+              {/* Demo Users List */}
+              {showDemoUsers && (
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Demo Accounts:</h4>
+                  {demoUsers.slice(0, 6).map((user, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => quickFillDemo(user.email, user.password)}
+                        className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                      >
+                        Use
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </form>
 
           {/* Sign Up Link */}

@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Mock user database
+  // Beta demo users database
   const [users, setUsers] = useState([
     {
       id: '1',
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     },
     {
       id: '2',
-      email: 'sarah@example.com',
+      email: 'sarah@chhimeki.com',
       password: 'password123',
       full_name: 'Sarah Chen',
       username: 'sarah_chen',
@@ -45,8 +45,104 @@ export const AuthProvider = ({ children }) => {
       following_count: 456,
       bio: 'Product Designer passionate about user experience',
       location: 'New York, NY',
-      website: null,
+      website: 'https://dribbble.com/sarah_chen',
       joined_date: '2024-02-20',
+      verified: true
+    },
+    {
+      id: '3',
+      email: 'alex@chhimeki.com',
+      password: 'beta2024',
+      full_name: 'Alex Rodriguez',
+      username: 'alex_rodriguez',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 892,
+      following_count: 234,
+      bio: 'Startup founder and tech entrepreneur',
+      location: 'Austin, TX',
+      website: 'https://alexrodriguez.com',
+      joined_date: '2024-03-10',
+      verified: true
+    },
+    {
+      id: '4',
+      email: 'maya@chhimeki.com',
+      password: 'betauser',
+      full_name: 'Maya Patel',
+      username: 'maya_patel',
+      avatar: null,
+      subscription_tier: 'professional',
+      followers_count: 567,
+      following_count: 123,
+      bio: 'UX/UI Designer at Google, design system enthusiast',
+      location: 'Mountain View, CA',
+      website: 'https://mayapatel.design',
+      joined_date: '2024-03-15',
+      verified: false
+    },
+    {
+      id: '5',
+      email: 'david@chhimeki.com',
+      password: 'chhimeki2024',
+      full_name: 'David Kim',
+      username: 'david_kim',
+      avatar: null,
+      subscription_tier: 'professional',
+      followers_count: 445,
+      following_count: 678,
+      bio: 'Software Engineer passionate about AI and ML',
+      location: 'Seattle, WA',
+      website: 'https://davidkim.dev',
+      joined_date: '2024-04-01',
+      verified: false
+    },
+    {
+      id: '6',
+      email: 'lisa@chhimeki.com',
+      password: 'lisatest',
+      full_name: 'Lisa Zhang',
+      username: 'lisa_zhang',
+      avatar: null,
+      subscription_tier: 'free',
+      followers_count: 234,
+      following_count: 456,
+      bio: 'Marketing professional and community builder',
+      location: 'Los Angeles, CA',
+      website: null,
+      joined_date: '2024-04-10',
+      verified: false
+    },
+    {
+      id: '7',
+      email: 'techie@chhimeki.com',
+      password: 'techbeta',
+      full_name: 'Tech Insider',
+      username: 'tech_insider',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 2340,
+      following_count: 89,
+      bio: 'Tech journalist and industry analyst',
+      location: 'San Jose, CA',
+      website: 'https://techinsider.com',
+      joined_date: '2024-02-01',
+      verified: true
+    },
+    {
+      id: '8',
+      email: 'creator@chhimeki.com',
+      password: 'create2024',
+      full_name: 'Creative Studio',
+      username: 'creative_studio',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 1890,
+      following_count: 345,
+      bio: 'Digital creative agency specializing in social media',
+      location: 'Miami, FL',
+      website: 'https://creativestudio.com',
+      joined_date: '2024-01-20',
       verified: true
     }
   ]);
@@ -206,7 +302,9 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     resetPassword,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    // Beta helper - expose demo users for testing
+    demoUsers: users.map(u => ({ email: u.email, password: u.password, name: u.full_name }))
   };
 
   return (
