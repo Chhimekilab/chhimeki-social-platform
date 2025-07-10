@@ -1,148 +1,29 @@
 {
-  "name": "chhimeki-social-platform",
+  "name": "chhimeki-super-app",
   "version": "1.0.0",
   "private": true,
-  "description": "A modern social media platform with real-time features and community-focused interactions",
-  "author": "Chhimeki Team",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.50.3",
-    "axios": "^1.10.0",
-    "cors": "^2.8.5",
-    "date-fns": "^4.1.0",
-    "express": "^4.18.2",
-    "lucide-react": "^0.263.1",
-    "node-cron": "^4.2.0",
-    "pg": "^8.11.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "uuid": "^11.1.0",
-    "web-vitals": "^3.3.2",
-    "ws": "^8.18.3"
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "react-scripts start",
-    "start:dev": "REACT_APP_ENV=development react-scripts start",
-    "start:test": "REACT_APP_ENV=test react-scripts start",
-    "start:server": "node server/server.js",
-    "start:full": "concurrently \"npm run start:server\" \"npm run start\"",
-    "build": "react-scripts build",
-    "build:dev": "REACT_APP_ENV=development react-scripts build",
-    "build:test": "REACT_APP_ENV=test react-scripts build",
-    "build:prod": "REACT_APP_ENV=production react-scripts build",
-    "test": "react-scripts test",
-    "test:watch": "react-scripts test --watch",
-    "test:coverage": "react-scripts test --coverage --verbose",
-    "test:ci": "CI=true react-scripts test --coverage --watchAll=false",
-    "lint": "eslint src/**/*.{js,jsx}",
-    "lint:fix": "eslint src/**/*.{js,jsx} --fix",
-    "format": "prettier --write src/**/*.{js,jsx,css,md}",
-    "format:check": "prettier --check src/**/*.{js,jsx,css,md}",
-    "eject": "react-scripts eject",
-    "version:check": "echo $npm_package_version",
-    "version:patch": "standard-version --release-as patch",
-    "version:minor": "standard-version --release-as minor",
-    "version:major": "standard-version --release-as major",
-    "version:prerelease": "standard-version --prerelease",
-    "version:beta": "standard-version --prerelease beta",
-    "version:alpha": "standard-version --prerelease alpha",
-    "version:first": "standard-version --first-release",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "changelog:all": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "release": "npm run lint && npm run test:ci && npm run version:patch",
-    "release:minor": "npm run lint && npm run test:ci && npm run version:minor",
-    "release:major": "npm run lint && npm run test:ci && npm run version:major",
-    "prebuild": "cross-env REACT_APP_VERSION=$npm_package_version npm run build",
-    "version:update": "node scripts/version-utils.js update",
-    "version:info": "node scripts/version-utils.js info",
-    "version:validate": "node scripts/version-utils.js validate",
-    "version:prepare": "node scripts/version-utils.js prepare",
-    "version:deploy": "node scripts/version-utils.js deploy",
-    "postversion": "npm run version:update"
+    "web": "yarn workspace @chhimeki/web start",
+    "mobile": "yarn workspace @chhimeki/mobile start",
+    "api": "yarn workspace @chhimeki/api start",
+    "build:web": "yarn workspace @chhimeki/web build",
+    "build:mobile": "yarn workspace @chhimeki/mobile build",
+    "dev": "concurrently \"yarn api\" \"yarn web\"",
+    "dev:all": "concurrently \"yarn api\" \"yarn web\" \"yarn mobile\"",
+    "lint": "yarn workspaces run lint",
+    "test": "yarn workspaces run test",
+    "clean": "yarn workspaces run clean",
+    "setup": "yarn install && yarn workspace @chhimeki/api setup"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
-    "concurrently": "^8.2.0",
-    "conventional-changelog-cli": "^5.0.0",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
-    "prettier": "^3.0.0",
-    "react-scripts": "5.0.1",
-    "standard-version": "^9.5.0"
+    "concurrently": "^7.6.0",
+    "lerna": "^6.4.1"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "standard-version": {
-    "releaseCommitMessageFormat": "chore(release): {{currentTag}} [skip ci]",
-    "scripts": {
-      "prebump": "echo 'Preparing new release...'",
-      "postbump": "echo 'Version bumped to {{nextRelease.version}}'",
-      "prechangelog": "echo 'Generating changelog...'",
-      "postchangelog": "echo 'Changelog updated'",
-      "precommit": "echo 'Committing changes...'",
-      "posttag": "echo 'Release tagged: {{nextRelease.gitTag}}'"
-    },
-    "types": [
-      {
-        "type": "feat",
-        "section": "🚀 Features"
-      },
-      {
-        "type": "fix",
-        "section": "🐛 Bug Fixes"
-      },
-      {
-        "type": "perf",
-        "section": "⚡ Performance Improvements"
-      },
-      {
-        "type": "refactor",
-        "section": "♻️ Code Refactoring"
-      },
-      {
-        "type": "docs",
-        "section": "📚 Documentation"
-      },
-      {
-        "type": "style",
-        "section": "💄 Styles"
-      },
-      {
-        "type": "test",
-        "section": "✅ Tests"
-      },
-      {
-        "type": "build",
-        "section": "🏗️ Build System"
-      },
-      {
-        "type": "ci",
-        "section": "👷 CI"
-      },
-      {
-        "type": "chore",
-        "hidden": true
-      }
-    ]
+  "engines": {
+    "node": ">=16.0.0",
+    "yarn": ">=1.22.0"
   }
 }
