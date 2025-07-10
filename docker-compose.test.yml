@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=test
+      - REACT_APP_ENV=test
+      - CI=true
+    command: ["npm", "run", "test:ci"]
+    networks:
+      - test-network
+
+  # Test database or services can be added here
+  test-db:
+    image: node:18-alpine
+    environment:
+      - NODE_ENV=test
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

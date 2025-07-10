@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "buildDate": "2025-07-07T20:30:26.192Z",
+  "gitHash": "678ea47eafb0740f8ae1b6f20c330ad2e5cb41f0",
+  "environment": "development",
+  "features": {
+    "supabaseIntegration": true,
+    "authentication": true,
+    "socialFeatures": true,
+    "communities": true,
+    "events": true,
+    "realTimeUpdates": true,
+    "fileUploads": false,
+    "pushNotifications": false,
+    "aiPostGeneration": true,
+    "aiModeration": true,
+    "trendDetection": true,
+    "liveComments": true,
+    "aiAnalytics": true
+  },
+  "apiVersions": {
+    "supabase": "2.x",
+    "react": "18.x"
+  },
+  "gitBranch": "cursor/create-test-and-dev-environments-e3bc",
+  "buildNumber": 20,
+  "buildTime": "2025-07-07T20:30:26.192Z"
+}
