@@ -17,7 +17,11 @@ import {
   LogOut,
   Home,
   Eye,
-  MessageCircle
+  MessageCircle,
+  MapPin,
+  Briefcase,
+  Calendar,
+  Rss
 } from 'lucide-react';
 import AuthWrapper from './components/auth/AuthWrapper';
 import { useAuth } from './contexts/AuthContext';
@@ -30,6 +34,10 @@ import AIDashboard from './components/ai/AIDashboard';
 import DigestViewer from './components/subscriptions/DigestViewer';
 import ChatInterface from './components/chat/ChatInterface';
 import ChatRooms from './components/chat/ChatRooms';
+
+// Import new dashboard components
+import NeighborhoodDashboard from './components/dashboard/NeighborhoodDashboard';
+import ProfessionalDashboard from './components/dashboard/ProfessionalDashboard';
 
 const App = () => {
   const { user: currentUser, logout } = useAuth();
@@ -389,6 +397,231 @@ const App = () => {
     );
   }
 
+  const tabs = [
+    { 
+      id: 'home', 
+      name: 'Home', 
+      icon: Home, 
+      component: 'feed',
+      description: 'Your social feed and updates'
+    },
+    { 
+      id: 'neighborhood', 
+      name: 'Neighborhood', 
+      icon: MapPin, 
+      component: 'neighborhood',
+      description: 'Local community, safety, and marketplace'
+    },
+    { 
+      id: 'professional', 
+      name: 'Professional', 
+      icon: Briefcase, 
+      component: 'professional',
+      description: 'Jobs, networking, and career development'
+    },
+    { 
+      id: 'communities', 
+      name: 'Communities', 
+      icon: Users, 
+      component: 'communities',
+      description: 'Join and manage communities'
+    },
+    { 
+      id: 'events', 
+      name: 'Events', 
+      icon: Calendar, 
+      component: 'events',
+      description: 'Discover and create events'
+    },
+    { 
+      id: 'stories', 
+      name: 'Stories', 
+      icon: Camera, 
+      component: 'stories',
+      description: 'Share temporary stories'
+    },
+    { 
+      id: 'notifications', 
+      name: 'Notifications', 
+      icon: Bell, 
+      component: 'notifications',
+      description: 'Your notifications and alerts'
+    },
+    { 
+      id: 'subscriptions', 
+      name: 'Subscriptions', 
+      icon: Rss, 
+      component: 'subscriptions',
+      description: 'AI-generated topic digests'
+    }
+  ];
+
+  const renderMainContent = () => {
+    // Handle new dashboard components
+    if (activeTab === 'neighborhood') {
+      return <NeighborhoodDashboard />;
+    }
+    
+    if (activeTab === 'professional') {
+      return <ProfessionalDashboard />;
+    }
+
+    // Chat Interface
+    if (showChatInterface) {
+      return (
+        <ChatInterface 
+          onClose={() => setShowChatInterface(false)}
+          onOpenChatRooms={() => {
+            setShowChatInterface(false);
+            setShowChatRooms(true);
+          }}
+        />
+      );
+    }
+
+    // Chat Rooms
+    if (showChatRooms) {
+      return (
+        <ChatRooms 
+          onClose={() => setShowChatRooms(false)}
+          onJoinRoom={handleJoinChatRoom}
+          onStartRandomChat={() => {
+            setShowChatRooms(false);
+            setShowChatInterface(true);
+          }}
+        />
+      );
+    }
+
+    // AI Dashboard
+    if (activeTab === 'subscriptions') {
+      return <AIDashboard />;
+    }
+
+    // Default feed rendering (home tab)
+    return (
+      <>
+        {/* Stories/Status */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+          <div className="flex space-x-4 overflow-x-auto pb-2">
+            <div className="flex-shrink-0 text-center cursor-pointer">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-lg">
+                <Camera className="w-6 h-6" />
+              </div>
+              <p className="text-xs text-gray-600 mt-1">Your Story</p>
+            </div>
+            {['SC', 'AR', 'TI', 'MP', 'DK'].map((initials, index) => (
+              <div key={index} className="flex-shrink-0 text-center cursor-pointer">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold border-4 border-orange-400 shadow-lg">
+                  {initials}
+                </div>
+                <p className="text-xs text-gray-600 mt-1">Story</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Create Post */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+          <div className="flex items-start space-x-4">
+            <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
+              {getAvatarInitials(currentUser?.full_name)}
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                value={postTitle}
+                onChange={(e) => setPostTitle(e.target.value)}
+                placeholder="Give your post a compelling title..."
+                className="w-full p-3 border border-gray-200 rounded-lg mb-3 font-medium text-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              />
+
+              <textarea
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+                placeholder="Share your thoughts, insights, or ask a question..."
+                className="w-full p-4 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg"
+                rows="4"
+              />
+
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex items-center space-x-4">
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
+                    <Image className="w-5 h-5" />
+                    <span>Photo</span>
+                  </button>
+                  <button className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
+                    <Video className="w-5 h-5" />
+                    <span>Video</span>
+                  </button>
+                </div>
+                <button
+                  onClick={handleCreatePost}
+                  disabled={!postTitle.trim() || postLoading}
+                  className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  {postLoading ? 'Publishing...' : 'Publish'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Posts Feed */}
+        <div className="space-y-8">
+          {posts.map(post => (
+            <article key={post.id} className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-start space-x-4 mb-4">
+                <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-medium">
+                  {post.avatar}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h3 className="font-medium text-gray-900">{post.author}</h3>
+                    {post.isPremium && <Crown className="w-4 h-4 text-yellow-500" />}
+                    {post.trending && (
+                      <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
+                        Trending
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    <span>{post.timestamp}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="ml-16">
+                <h2 className="text-xl font-bold text-gray-900 mb-3">{post.title}</h2>
+                <p className="text-gray-700 text-lg leading-relaxed mb-6">{post.content}</p>
+                
+                <div className="flex items-center space-x-6">
+                  <button 
+                    onClick={() => handleLikePost(post.id)}
+                    className={`flex items-center space-x-2 transition-colors ${
+                      post.isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
+                    <span className="font-medium">{post.likes}</span>
+                  </button>
+                  <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="font-medium">{post.comments}</span>
+                  </button>
+                  <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
+                    <Share className="w-5 h-5" />
+                    <span className="font-medium">Share</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </>
+    );
+  };
+
   return (
     <AuthWrapper>
       <div className="min-h-screen bg-gray-50">
@@ -408,16 +641,16 @@ const App = () => {
             </div>
 
             <nav className="hidden md:flex items-center space-x-8">
-              {['home', 'trending', 'communities', 'relationships', 'ai-dashboard'].map((tab) => (
+              {tabs.map((tab) => (
                 <button
-                  key={tab}
-                  onClick={() => handleTabSwitch(tab)}
+                  key={tab.id}
+                  onClick={() => handleTabSwitch(tab.id)}
                   className={`font-medium transition-colors flex items-center space-x-1 ${
-                    activeTab === tab ? 'text-orange-600 border-b-2 border-orange-600 pb-4' : 'text-gray-600 hover:text-gray-900'
+                    activeTab === tab.id ? 'text-orange-600 border-b-2 border-orange-600 pb-4' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  {tab === 'home' && <Home className="w-4 h-4" />}
-                  <span>{tab === 'ai-dashboard' ? '🤖 AI Dashboard' : tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+                  <tab.icon className="w-4 h-4" />
+                  <span>{tab.name}</span>
                 </button>
               ))}
             </nav>
@@ -719,135 +952,17 @@ const App = () => {
           </div>
           )}
 
-          {/* Main Content */}
-          <div className={activeTab === 'ai-dashboard' ? 'lg:col-span-1' : 'lg:col-span-2'}>
-            {activeTab === 'ai-dashboard' ? (
-              <AIDashboard />
-            ) : (
-              <>
-                {/* Stories/Status */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-                  <div className="flex space-x-4 overflow-x-auto pb-2">
-                    <div className="flex-shrink-0 text-center cursor-pointer">
-                      <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-lg">
-                        <Camera className="w-6 h-6" />
-                      </div>
-                      <p className="text-xs text-gray-600 mt-1">Your Story</p>
-                    </div>
-                    {['SC', 'AR', 'TI', 'MP', 'DK'].map((initials, index) => (
-                      <div key={index} className="flex-shrink-0 text-center cursor-pointer">
-                        <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold border-4 border-orange-400 shadow-lg">
-                          {initials}
-                        </div>
-                        <p className="text-xs text-gray-600 mt-1">Story</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                      {/* Main Content */}
+            <div className={
+              activeTab === 'subscriptions' || activeTab === 'neighborhood' || activeTab === 'professional' 
+                ? 'lg:col-span-3' 
+                : 'lg:col-span-2'
+            }>
+             {renderMainContent()}
+            </div>
 
-                {/* Create Post */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {getAvatarInitials(currentUser?.full_name)}
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={postTitle}
-                        onChange={(e) => setPostTitle(e.target.value)}
-                        placeholder="Give your post a compelling title..."
-                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 font-medium text-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                      />
-
-                      <textarea
-                        value={newPost}
-                        onChange={(e) => setNewPost(e.target.value)}
-                        placeholder="Share your thoughts, insights, or ask a question..."
-                        className="w-full p-4 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg"
-                        rows="4"
-                      />
-
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center space-x-4">
-                          <button className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
-                            <Image className="w-5 h-5" />
-                            <span>Photo</span>
-                          </button>
-                          <button className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 transition-colors">
-                            <Video className="w-5 h-5" />
-                            <span>Video</span>
-                          </button>
-                        </div>
-                        <button
-                          onClick={handleCreatePost}
-                          disabled={!postTitle.trim() || postLoading}
-                          className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                        >
-                          {postLoading ? 'Publishing...' : 'Publish'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Posts Feed */}
-                <div className="space-y-8">
-                  {posts.map(post => (
-                    <article key={post.id} className="bg-white border border-gray-200 rounded-lg p-6">
-                      <div className="flex items-start space-x-4 mb-4">
-                        <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white font-medium">
-                          {post.avatar}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="font-medium text-gray-900">{post.author}</h3>
-                            {post.isPremium && <Crown className="w-4 h-4 text-yellow-500" />}
-                            {post.trending && (
-                              <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
-                                Trending
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            <span>{post.timestamp}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="ml-16">
-                        <h2 className="text-xl font-bold text-gray-900 mb-3">{post.title}</h2>
-                        <p className="text-gray-700 text-lg leading-relaxed mb-6">{post.content}</p>
-                        
-                        <div className="flex items-center space-x-6">
-                          <button 
-                            onClick={() => handleLikePost(post.id)}
-                            className={`flex items-center space-x-2 transition-colors ${
-                              post.isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-                            }`}
-                          >
-                            <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
-                            <span className="font-medium">{post.likes}</span>
-                          </button>
-                          <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
-                            <MessageSquare className="w-5 h-5" />
-                            <span className="font-medium">{post.comments}</span>
-                          </button>
-                          <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
-                            <Share className="w-5 h-5" />
-                            <span className="font-medium">Share</span>
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Right Sidebar */}
-          {activeTab !== 'ai-dashboard' && (
+                      {/* Right Sidebar */}
+            {!(activeTab === 'subscriptions' || activeTab === 'neighborhood' || activeTab === 'professional') && (
             <div className="space-y-6">
             {/* User Profile Card */}
             <div className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6">
