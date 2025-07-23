@@ -5,6 +5,7 @@ import Header from './components/Layout/Header';
 import MainLayout from './components/Layout/MainLayout';
 import NewsSection from './components/Content/NewsSection';
 import TrendingSection from './components/Content/TrendingSection';
+import NeighborhoodSection from './components/Content/NeighborhoodSection';
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -219,14 +220,7 @@ const App = () => {
           </div>
         );
       case 'neighborhood':
-        return (
-          <div className="space-y-8">
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Neighborhood</h2>
-              <p className="text-gray-600">Discover local businesses and community events</p>
-            </div>
-          </div>
-        );
+        return <NeighborhoodSection />;
       case 'analytics':
         return <AnalyticsDashboard />;
       default:
