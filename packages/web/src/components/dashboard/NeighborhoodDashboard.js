@@ -32,6 +32,10 @@ const NeighborhoodDashboard = () => {
   const [communityPolls, setCommunityPolls] = useState([]);
   const [lostAndFound, setLostAndFound] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Nextdoor-style enhanced features
+  const [safetyAlerts, setSafetyAlerts] = useState([]);
+  const [localEvents, setLocalEvents] = useState([]);
+  const [neighborhoodRecommendations, setNeighborhoodRecommendations] = useState([]);
 
   // Filters
   const [safetyFilters, setSafetyFilters] = useState({});
