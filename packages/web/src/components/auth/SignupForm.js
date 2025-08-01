@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, Users, ArrowRight, Loader2, User, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Users, ArrowRight, Loader2, User, Check, X, Star, Gift, Info } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const SignupForm = ({ onSwitchToLogin }) => {
@@ -119,6 +119,14 @@ const SignupForm = ({ onSwitchToLogin }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Beta Badge */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-sm font-medium shadow-lg">
+            <Star className="w-4 h-4 mr-2" />
+            Beta Version
+          </div>
+        </div>
+
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -126,6 +134,19 @@ const SignupForm = ({ onSwitchToLogin }) => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Chhimeki</h1>
           <p className="text-gray-600">Create your account and connect with others</p>
+        </div>
+
+        {/* Beta Welcome */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <Gift className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-medium text-green-900 mb-1">Beta Early Access</h3>
+              <p className="text-sm text-green-700">
+                Join our beta community and get early access to all premium features!
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Signup Form */}
@@ -294,6 +315,18 @@ const SignupForm = ({ onSwitchToLogin }) => {
               )}
             </div>
 
+            {/* Beta Terms */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-start">
+                <Info className="w-4 h-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-blue-700">
+                    <strong>Beta Terms:</strong> By joining our beta, you'll get early access to new features and help shape the future of Chhimeki.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Terms and Conditions */}
             <div className="flex items-start">
               <input
@@ -350,6 +383,21 @@ const SignupForm = ({ onSwitchToLogin }) => {
                 Sign in
               </button>
             </p>
+          </div>
+        </div>
+
+        {/* Beta Features */}
+        <div className="mt-6 text-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Beta Features Include:</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+              <div>✨ All Premium Features</div>
+              <div>🌍 Neighborhood Network</div>
+              <div>💼 Professional Hub</div>
+              <div>🛡️ Safety Features</div>
+              <div>🤖 AI-Powered Insights</div>
+              <div>💬 Advanced Messaging</div>
+            </div>
           </div>
         </div>
       </div>
