@@ -670,6 +670,18 @@ const App = () => {
               <Home className="w-5 h-5" />
             </button>
 
+            {/* Mobile Logout Button */}
+            <button
+              onClick={() => {
+                console.log('🔄 Mobile logout button clicked')
+                signOut()
+              }}
+              className="md:hidden p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+
             <div className="flex items-center space-x-4">
               <button className="hidden md:flex items-center space-x-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all">
                 <Crown className="w-4 h-4" />
@@ -877,18 +889,22 @@ const App = () => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => {
-                  console.log('🔄 Logout button clicked')
-                  signOut()
-                }}
-                  className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    console.log('🔄 Logout button clicked')
+                    signOut()
+                  }}
+                  className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
                   title="Logout"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Logout</span>
                 </button>
                 
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:bg-gray-700 transition-colors" title={`Logged in as ${currentUser?.full_name || 'Demo User'}`}>
                     {getAvatarInitials(currentUser?.full_name)}
+                  </div>
+                  <div className="hidden sm:block text-sm text-gray-700">
+                    {currentUser?.full_name || 'Demo User'}
                   </div>
                 </div>
               </div>
