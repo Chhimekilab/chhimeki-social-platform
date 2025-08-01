@@ -1,47 +1,139 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, Sun, CloudRain, Snow, Wind, Thermometer, Droplets, Eye } from 'lucide-react';
+import { weatherAPI } from '../../services/realApis';
+import { Cloud, Sun, CloudRain, Snow, Wind, Thermometer, Droplets, Eye, MapPin, RefreshCw } from 'lucide-react';
 
 const WeatherWidget = () => {
   const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState('San Francisco, CA');
+  const [error, setError] = useState(null);
 
-  // Mock weather data - in a real app, you'd fetch from a weather API
+  // Fallback mock weather data
+  const mockWeather = {
+    location: 'San Francisco, CA',
+    temperature: 72,
+    condition: 'partly-cloudy',
+    description: 'Partly Cloudy',
+    humidity: 65,
+    windSpeed: 12,
+    visibility: 10,
+    uvIndex: 6,
+    hourlyForecast: [
+      { time: '12 PM', temp: 72, icon: 'partly-cloudy' },
+      { time: '1 PM', temp: 74, icon: 'sunny' },
+      { time: '2 PM', temp: 76, icon: 'sunny' },
+      { time: '3 PM', temp: 75, icon: 'partly-cloudy' },
+      { time: '4 PM', temp: 73, icon: 'cloudy' }
+    ],
+    weeklyForecast: [
+      { day: 'Today', high: 76, low: 58, icon: 'partly-cloudy' },
+      { day: 'Tomorrow', high: 78, low: 60, icon: 'sunny' },
+      { day: 'Wed', high: 74, low: 56, icon: 'cloudy' },
+      { day: 'Thu', high: 71, low: 54, icon: 'rainy' },
+      { day: 'Fri', high: 69, low: 52, icon: 'rainy' }
+    ]
+  };
+
   useEffect(() => {
-    const fetchWeather = async () => {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockWeather = {
-        location: 'San Francisco, CA',
-        temperature: 72,
-        condition: 'partly-cloudy',
-        description: 'Partly Cloudy',
-        humidity: 65,
-        windSpeed: 12,
-        visibility: 10,
-        uvIndex: 6,
-        hourlyForecast: [
-          { time: '12 PM', temp: 72, icon: 'partly-cloudy' },
-          { time: '1 PM', temp: 74, icon: 'sunny' },
-          { time: '2 PM', temp: 76, icon: 'sunny' },
-          { time: '3 PM', temp: 75, icon: 'partly-cloudy' },
-          { time: '4 PM', temp: 73, icon: 'cloudy' }
-        ],
-        weeklyForecast: [
-          { day: 'Today', high: 76, low: 58, icon: 'partly-cloudy' },
-          { day: 'Tomorrow', high: 78, low: 60, icon: 'sunny' },
-          { day: 'Wed', high: 74, low: 56, icon: 'cloudy' },
-          { day: 'Thu', high: 71, low: 54, icon: 'rainy' },
-          { day: 'Fri', high: 69, low: 52, icon: 'rainy' }
-        ]
-      };
-      
-      setWeather(mockWeather);
-      setLoading(false);
-    };
-
     fetchWeather();
-  }, []);
+  }, [location]);
+
+  const fetchWeather = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Extract city from location string
+      const city = location.split(',')[0].trim();
+      
+      // Fetch current weather and forecast
+      const [currentData, forecastData] = await Promise.allSettled([
+        weatherAPI.getCurrentWeather(city),
+        weatherAPI.getWeatherForecast(city)
+      ]);
+      
+      if (currentData.status === 'fulfilled' && currentData.value) {
+        const weatherData = currentData.value;
+        
+        // Convert API data to our format
+        const processedWeather = {
+          location: location,
+          temperature: Math.round(weatherData.main.temp),
+          condition: mapWeatherCondition(weatherData.weather[0].main),
+          description: weatherData.weather[0].description,
+          humidity: weatherData.main.humidity,
+          windSpeed: Math.round(weatherData.wind.speed * 2.237), // Convert m/s to mph
+          visibility: Math.round(weatherData.visibility / 1609.34), // Convert meters to miles
+          uvIndex: 6, // OpenWeatherMap doesn't provide UV in free tier
+          hourlyForecast: generateHourlyForecast(forecastData.value),
+          weeklyForecast: generateWeeklyForecast(forecastData.value)
+        };
+        
+        setWeather(processedWeather);
+        setForecast(forecastData.value);
+      } else {
+        // Fallback to mock data
+        console.log('⚠️ Using fallback weather data');
+        setWeather(mockWeather);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+      setError('Failed to load weather data');
+      setWeather(mockWeather); // Fallback to mock data
+      setLoading(false);
+    }
+  };
+
+  const mapWeatherCondition = (weatherMain) => {
+    const conditionMap = {
+      'Clear': 'sunny',
+      'Clouds': 'partly-cloudy',
+      'Rain': 'rainy',
+      'Snow': 'snowy',
+      'Thunderstorm': 'rainy',
+      'Drizzle': 'rainy',
+      'Mist': 'cloudy',
+      'Smoke': 'cloudy',
+      'Haze': 'cloudy',
+      'Dust': 'cloudy',
+      'Fog': 'cloudy',
+      'Sand': 'cloudy',
+      'Ash': 'cloudy',
+      'Squall': 'cloudy',
+      'Tornado': 'cloudy'
+    };
+    return conditionMap[weatherMain] || 'partly-cloudy';
+  };
+
+  const generateHourlyForecast = (forecastData) => {
+    if (!forecastData || !forecastData.list) return mockWeather.hourlyForecast;
+    
+    return forecastData.list.slice(0, 5).map((item, index) => ({
+      time: new Date(item.dt * 1000).toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        hour12: true 
+      }),
+      temp: Math.round(item.main.temp),
+      icon: mapWeatherCondition(item.weather[0].main)
+    }));
+  };
+
+  const generateWeeklyForecast = (forecastData) => {
+    if (!forecastData || !forecastData.list) return mockWeather.weeklyForecast;
+    
+    const dailyData = forecastData.list.filter((item, index) => index % 8 === 0).slice(0, 5);
+    const days = ['Today', 'Tomorrow', 'Wed', 'Thu', 'Fri'];
+    
+    return dailyData.map((item, index) => ({
+      day: days[index] || new Date(item.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
+      high: Math.round(item.main.temp_max),
+      low: Math.round(item.main.temp_min),
+      icon: mapWeatherCondition(item.weather[0].main)
+    }));
+  };
 
   const getWeatherIcon = (condition, size = 'w-8 h-8') => {
     switch (condition) {
@@ -103,7 +195,16 @@ const WeatherWidget = () => {
             <h3 className="text-lg font-semibold">Weather</h3>
             <p className="text-sm opacity-90">{weather.location}</p>
           </div>
-          {getWeatherIcon(weather.condition, 'w-12 h-12')}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={fetchWeather}
+              className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+              title="Refresh weather"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+            {getWeatherIcon(weather.condition, 'w-12 h-12')}
+          </div>
         </div>
         
         <div className="flex items-baseline">

@@ -260,7 +260,7 @@ const ActivityFeedWidget = () => {
                       </span>
                       <span className="text-gray-600 ml-1">{activity.action}</span>
                       {activity.target && (
-                        <span className="font-medium text-gray-900 ml-1">"{activity.target}"</span>
+                        <span className="font-medium text-gray-900 ml-1">&quot;{activity.target}&quot;</span>
                       )}
                     </p>
                     <div className="flex items-center space-x-1 mt-1">

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { trendingService } from '../realApis';
 
-// Mock trending topics data
+// Fallback mock trending topics data
 const MOCK_TRENDING_TOPICS = [
   {
     topic: "AI Revolution in Healthcare",
@@ -200,7 +201,18 @@ const categorizeTopic = (title) => {
  */
 export const getTrendingTopics = async (limit = 10) => {
   try {
-    console.log('🔥 Getting trending topics...');
+    console.log('🔥 Getting trending topics from real APIs...');
+    
+    // Try to get real trending topics first
+    const realTopics = await trendingService.getAllTrendingTopics(limit);
+    
+    if (realTopics && realTopics.length > 0) {
+      console.log(`✅ Found ${realTopics.length} real trending topics`);
+      return realTopics;
+    }
+    
+    // Fallback to mock data if real APIs fail
+    console.log('⚠️ Falling back to mock trending topics...');
     
     // Get data from both sources
     const [newsData, trendsData] = await Promise.all([
@@ -226,7 +238,7 @@ export const getTrendingTopics = async (limit = 10) => {
         is_active: true
       }));
     
-    console.log(`✅ Found ${sortedTopics.length} trending topics`);
+    console.log(`✅ Found ${sortedTopics.length} fallback trending topics`);
     return sortedTopics;
     
   } catch (error) {

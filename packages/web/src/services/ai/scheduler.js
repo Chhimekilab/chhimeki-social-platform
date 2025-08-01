@@ -1,4 +1,3 @@
-import cron from 'node-cron';
 import { v4 as uuidv4 } from 'uuid';
 import { getTrendingTopics } from './trendDetection';
 import { generateTrendPost } from './contentGenerator';
@@ -204,7 +203,7 @@ export const startScheduler = () => {
   schedulerState.stats.lastRun = new Date().toISOString();
   
   // Main content generation task - every 5 minutes
-  const contentTask = cron.schedule('*/5 * * * *', async () => {
+  const contentTask = setInterval(async () => {
     if (!schedulerState.isRunning) return;
     
     try {
@@ -219,10 +218,10 @@ export const startScheduler = () => {
     } catch (error) {
       console.error('Error in scheduled content generation:', error);
     }
-  });
+  }, 5 * 60 * 1000); // 5 minutes
   
   // Trending topics update - every 15 minutes
-  const trendsTask = cron.schedule('*/15 * * * *', async () => {
+  const trendsTask = setInterval(async () => {
     if (!schedulerState.isRunning) return;
     
     try {
@@ -230,10 +229,10 @@ export const startScheduler = () => {
     } catch (error) {
       console.error('Error in scheduled trends update:', error);
     }
-  });
+  }, 15 * 60 * 1000); // 15 minutes
   
   // Cleanup task - every hour
-  const cleanupTask = cron.schedule('0 * * * *', async () => {
+  const cleanupTask = setInterval(async () => {
     if (!schedulerState.isRunning) return;
     
     try {
@@ -241,7 +240,7 @@ export const startScheduler = () => {
     } catch (error) {
       console.error('Error in scheduled cleanup:', error);
     }
-  });
+  }, 60 * 60 * 1000); // 1 hour
   
   // Store tasks
   schedulerState.tasks.set('content', contentTask);
@@ -278,7 +277,7 @@ export const stopScheduler = () => {
   
   // Stop all tasks
   schedulerState.tasks.forEach((task, name) => {
-    task.destroy();
+    clearInterval(task);
     console.log(`❌ Stopped ${name} task`);
   });
   

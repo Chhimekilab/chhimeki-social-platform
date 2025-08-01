@@ -45,14 +45,14 @@ const ForgotPasswordForm = ({ onSwitchToLogin }) => {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Check your email</h1>
             <p className="text-gray-600">
-              We've sent a password reset link to <strong>{email}</strong>
+              We&apos;ve sent a password reset link to <strong>{email}</strong>
             </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center">
             <div className="mb-6">
               <p className="text-gray-700 mb-4">
-                Click the link in the email to reset your password. If you don't see the email, check your spam folder.
+                Click the link in the email to reset your password. If you don&apos;t see the email, check your spam folder.
               </p>
               <p className="text-sm text-gray-500">
                 The link will expire in 24 hours for security reasons.
@@ -81,7 +81,7 @@ const ForgotPasswordForm = ({ onSwitchToLogin }) => {
             <Users className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Forgot Password?</h1>
-          <p className="text-gray-600">Enter your email and we'll send you a reset link</p>
+          <p className="text-gray-600">Enter your email and we&apos;ll send you a reset link</p>
         </div>
 
         {/* Reset Form */}
@@ -153,7 +153,7 @@ const ForgotPasswordForm = ({ onSwitchToLogin }) => {
         {/* Security Note */}
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>
-            For security reasons, we'll only send reset instructions to registered email addresses.
+            For security reasons, we&apos;ll only send reset instructions to registered email addresses.
           </p>
         </div>
       </div>

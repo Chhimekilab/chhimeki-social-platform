@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../services/supabaseClient'
-import { userService } from '../services/databaseService'
+import { mockAuthService } from '../services/mockAuthService'
 
 const AuthContext = createContext({})
 
@@ -147,13 +146,125 @@ export const AuthProvider = ({ children }) => {
       website: 'https://creativestudio.com',
       joined_date: '2024-01-20',
       verified: true
+    },
+    {
+      id: '9',
+      email: 'emma@chhimeki.com',
+      password: 'emma2024',
+      full_name: 'Emma Wilson',
+      username: 'emma_wilson',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 3420,
+      following_count: 567,
+      bio: 'Content creator and lifestyle influencer',
+      location: 'Los Angeles, CA',
+      website: 'https://emmawilson.com',
+      joined_date: '2024-01-05',
+      verified: true
+    },
+    {
+      id: '10',
+      email: 'james@chhimeki.com',
+      password: 'james123',
+      full_name: 'James Thompson',
+      username: 'james_thompson',
+      avatar: null,
+      subscription_tier: 'professional',
+      followers_count: 789,
+      following_count: 234,
+      bio: 'Financial advisor helping people build wealth',
+      location: 'Chicago, IL',
+      website: 'https://jamesthompson.com',
+      joined_date: '2024-02-15',
+      verified: false
+    },
+    {
+      id: '11',
+      email: 'sophia@chhimeki.com',
+      password: 'sophia456',
+      full_name: 'Sophia Martinez',
+      username: 'sophia_martinez',
+      avatar: null,
+      subscription_tier: 'free',
+      followers_count: 156,
+      following_count: 89,
+      bio: 'Student and aspiring photographer',
+      location: 'Boston, MA',
+      website: null,
+      joined_date: '2024-03-25',
+      verified: false
+    },
+    {
+      id: '12',
+      email: 'mike@chhimeki.com',
+      password: 'mike789',
+      full_name: 'Mike Johnson',
+      username: 'mike_johnson',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 5670,
+      following_count: 123,
+      bio: 'Fitness coach and wellness advocate',
+      location: 'Denver, CO',
+      website: 'https://mikejohnsonfitness.com',
+      joined_date: '2024-01-10',
+      verified: true
+    },
+    {
+      id: '13',
+      email: 'anna@chhimeki.com',
+      password: 'anna2024',
+      full_name: 'Anna Lee',
+      username: 'anna_lee',
+      avatar: null,
+      subscription_tier: 'professional',
+      followers_count: 890,
+      following_count: 456,
+      bio: 'Chef and food blogger sharing culinary adventures',
+      location: 'Portland, OR',
+      website: 'https://annaleechef.com',
+      joined_date: '2024-02-28',
+      verified: false
+    },
+    {
+      id: '14',
+      email: 'carlos@chhimeki.com',
+      password: 'carlos123',
+      full_name: 'Carlos Rodriguez',
+      username: 'carlos_rodriguez',
+      avatar: null,
+      subscription_tier: 'free',
+      followers_count: 234,
+      following_count: 567,
+      bio: 'Music producer and DJ',
+      location: 'Nashville, TN',
+      website: 'https://carlosrodriguezmusic.com',
+      joined_date: '2024-04-05',
+      verified: false
+    },
+    {
+      id: '15',
+      email: 'admin@chhimeki.com',
+      password: 'admin2024',
+      full_name: 'Chhimeki Admin',
+      username: 'chhimeki_admin',
+      avatar: null,
+      subscription_tier: 'premium',
+      followers_count: 12340,
+      following_count: 89,
+      bio: 'Official Chhimeki platform administrator',
+      location: 'San Francisco, CA',
+      website: 'https://chhimeki.com',
+      joined_date: '2024-01-01',
+      verified: true
     }
   ])
 
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await mockAuthService.getSession()
       if (session?.user) {
         setUser(session.user)
         await loadProfile(session.user.id)
@@ -162,27 +273,11 @@ export const AuthProvider = ({ children }) => {
     }
 
     getInitialSession()
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user)
-          await loadProfile(session.user.id)
-        } else {
-          setUser(null)
-          setProfile(null)
-        }
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
   }, [])
 
   const loadProfile = async (userId) => {
     try {
-      const { data, error } = await userService.getProfile(userId)
+      const { data, error } = await mockAuthService.getProfile(userId)
       if (error) {
         console.error('Error loading profile:', error)
       } else {
@@ -195,7 +290,7 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (email, password, userData = {}) => {
     try {
-      const { data, error } = await userService.signUp(email, password, userData)
+      const { data, error } = await mockAuthService.signUp(email, password, userData)
       if (error) throw error
       return { data, error: null }
     } catch (error) {
@@ -205,8 +300,15 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (email, password) => {
     try {
-      const { data, error } = await userService.signIn(email, password)
+      const { data, error } = await mockAuthService.signIn(email, password)
       if (error) throw error
+      
+      // Set user and load profile on successful login
+      if (data?.user) {
+        setUser(data.user)
+        await loadProfile(data.user.id)
+      }
+      
       return { data, error: null }
     } catch (error) {
       return { data: null, error }
@@ -215,12 +317,15 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
-      const { error } = await userService.signOut()
+      console.log('🔄 Signing out user...')
+      const { error } = await mockAuthService.signOut()
       if (error) throw error
       setUser(null)
       setProfile(null)
+      console.log('✅ User signed out successfully')
       return { error: null }
     } catch (error) {
+      console.error('❌ Error signing out:', error)
       return { error }
     }
   }
@@ -229,7 +334,7 @@ export const AuthProvider = ({ children }) => {
     if (!user) return { error: 'No user logged in' }
     
     try {
-      const { data, error } = await userService.updateProfile(user.id, updates)
+      const { data, error } = await mockAuthService.updateProfile(user.id, updates)
       if (error) throw error
       
       // Update local profile state
@@ -242,7 +347,7 @@ export const AuthProvider = ({ children }) => {
 
   const resetPassword = async (email) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email)
+      const { error } = await mockAuthService.resetPassword(email)
       if (error) throw error
       return { error: null }
     } catch (error) {

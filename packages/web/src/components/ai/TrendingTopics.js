@@ -233,7 +233,7 @@ const TrendingTopics = () => {
           <div className="text-6xl mb-4">📈</div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No trending topics found</h3>
           <p className="text-gray-600 mb-6">
-            We're working on detecting the latest trends. Check back in a few minutes!
+            We&apos;re working on detecting the latest trends. Check back in a few minutes!
           </p>
           <button
             onClick={loadTrendingTopics}

@@ -29,6 +29,10 @@ import WeatherWidget from './components/widgets/WeatherWidget';
 import TrendingTopicsWidget from './components/widgets/TrendingTopicsWidget';
 import QuickActionsWidget from './components/widgets/QuickActionsWidget';
 import ActivityFeedWidget from './components/widgets/ActivityFeedWidget';
+import SportsWidget from './components/widgets/SportsWidget';
+import NewsWidget from './components/widgets/NewsWidget';
+import AIContentGenerator from './components/ai/AIContentGenerator';
+import AIAssistant from './components/ai/AIAssistant';
 import { FooterVersion } from './components/version/VersionInfo';
 import AIDashboard from './components/ai/AIDashboard';
 import DigestViewer from './components/subscriptions/DigestViewer';
@@ -40,9 +44,10 @@ import NeighborhoodDashboard from './components/dashboard/NeighborhoodDashboard'
 import ProfessionalDashboard from './components/dashboard/ProfessionalDashboard';
 
 const App = () => {
-  const { user: currentUser, logout } = useAuth();
+  const { user: currentUser, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [showRealTimeWidgets, setShowRealTimeWidgets] = useState(false);
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
   const [postTitle, setPostTitle] = useState('');
@@ -680,6 +685,19 @@ const App = () => {
                 <span className="hidden sm:inline">Subscriptions</span>
               </button>
 
+              {/* Real-time Widgets Button */}
+              <button 
+                onClick={() => setShowRealTimeWidgets(!showRealTimeWidgets)}
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  showRealTimeWidgets 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600' 
+                    : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Live Data</span>
+              </button>
+
               {/* Live Chat Button */}
               <div className="relative">
                 <button 
@@ -858,7 +876,10 @@ const App = () => {
               
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                  console.log('🔄 Logout button clicked')
+                  signOut()
+                }}
                   className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
                   title="Logout"
                 >
@@ -1023,6 +1044,36 @@ const App = () => {
             {/* Trending Topics Widget - Enhanced */}
             <TrendingTopicsWidget />
 
+            {/* Real-time Widgets Section */}
+            {showRealTimeWidgets && (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2" />
+                    Live Real-time Data
+                  </h3>
+                  <p className="text-sm opacity-90 mt-1">
+                    Real-time news, sports, and weather from live APIs
+                  </p>
+                </div>
+                
+                {/* Sports Widget */}
+                <SportsWidget />
+                
+                {/* News Widget */}
+                <NewsWidget />
+                
+                {/* Enhanced Weather Widget */}
+                <WeatherWidget />
+                
+                {/* AI Content Generator */}
+                <AIContentGenerator />
+                
+                {/* AI Assistant */}
+                <AIAssistant currentUser={currentUser} />
+              </div>
+            )}
+
             {/* People You May Know */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
@@ -1152,7 +1203,7 @@ const App = () => {
               </div>
 
               <div className="mb-6">
-                <p className="text-gray-600">Subscribe to topics you're interested in and receive AI-generated digests based on your preferred frequency.</p>
+                <p className="text-gray-600">Subscribe to topics you&apos;re interested in and receive AI-generated digests based on your preferred frequency.</p>
               </div>
 
               {/* Current Subscriptions */}

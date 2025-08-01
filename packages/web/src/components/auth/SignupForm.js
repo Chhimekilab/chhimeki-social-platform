@@ -321,7 +321,7 @@ const SignupForm = ({ onSwitchToLogin }) => {
                 <Info className="w-4 h-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
                 <div className="text-sm">
                   <p className="text-blue-700">
-                    <strong>Beta Terms:</strong> By joining our beta, you'll get early access to new features and help shape the future of Chhimeki.
+                    <strong>Beta Terms:</strong> By joining our beta, you&apos;ll get early access to new features and help shape the future of Chhimeki.
                   </p>
                 </div>
               </div>

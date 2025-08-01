@@ -269,7 +269,7 @@ const LoginForm = ({ onSwitchToSignup, onSwitchToForgotPassword }) => {
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button
                 onClick={onSwitchToSignup}
                 className="font-medium text-orange-600 hover:text-orange-700 transition-colors"
