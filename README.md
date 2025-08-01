@@ -22,10 +22,18 @@ A comprehensive social media application that combines the best features from Fa
 
 ### Advanced Features
 - **Communities** - Create and join interest-based communities
-- **Neighborhood Features** - Local business listings, events, safety alerts
+- **Neighborhood Features** - Complete Nextdoor-inspired local community platform
 - **Live Events** - Real-time streaming and live content
 - **Media Upload** - Advanced photo and video sharing capabilities
 - **Premium Features** - Enhanced privacy controls and exclusive access
+
+### Nextdoor-Inspired Neighborhood Features
+- **Safety Alerts** - Real-time emergency notifications from trusted sources (power outages, weather warnings, safety updates)
+- **Local News Integration** - Hyperlocal news from verified local publishers with category filtering
+- **AI Recommendations (Faves)** - Intelligent chatbot trained on neighborhood conversations for local recommendations
+- **Neighborhood Marketplace** - For Sale & Free listings with distance-based filtering
+- **Community Events** - Local event discovery and organization with RSVP functionality
+- **Local Business Directory** - Comprehensive business listings with ratings, hours, and contact information
 
 ### Content Categories
 - **Technology** - Latest tech news and innovations
@@ -107,10 +115,12 @@ npm start
 - Community-specific discussions
 
 #### 🏘️ Neighborhood Tab
-- Location-based content
-- Local business listings
-- Community events and alerts
-- Distance-based recommendations
+- **Safety Alerts** - Real-time emergency notifications with severity levels and trusted sources
+- **Local News** - Hyperlocal news articles with category filtering and engagement metrics
+- **AI Assistant** - Nextdoor-style Faves chatbot for local recommendations and discoveries
+- **Marketplace** - Buy, sell, and give away items with neighbor verification
+- **Events** - Community event calendar with RSVP and organization tools
+- **Business Directory** - Local business listings with ratings, hours, and contact information
 
 ## 🎨 UI/UX Features
 
