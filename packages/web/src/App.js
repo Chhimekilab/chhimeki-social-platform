@@ -21,7 +21,10 @@ import {
   MapPin,
   Briefcase,
   Calendar,
-  Rss
+  Rss,
+  User,
+  Settings,
+  HelpCircle
 } from 'lucide-react';
 import AuthWrapper from './components/auth/AuthWrapper';
 import { useAuth } from './contexts/AuthContext';
@@ -70,11 +73,13 @@ const App = () => {
   const [showChatRooms, setShowChatRooms] = useState(false);
   const [activeChatRoom, setActiveChatRoom] = useState(null);
   const [unreadChatMessages, setUnreadChatMessages] = useState(3);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   
   // Refs for click-outside detection
   const notificationsRef = useRef(null);
   const messagesRef = useRef(null);
   const searchRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   // Available topics for subscription
   const availableTopics = [
@@ -254,10 +259,13 @@ const App = () => {
       if (messagesRef.current && !messagesRef.current.contains(event.target)) {
         setShowMessages(false);
       }
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowSearchResults(false);
-      }
-    };
+          if (searchRef.current && !searchRef.current.contains(event.target)) {
+      setShowSearchResults(false);
+    }
+    if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+      setShowUserMenu(false);
+    }
+  };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -327,6 +335,10 @@ const App = () => {
   const handleCloseDigestViewer = () => {
     setShowDigestViewer(false);
     setSelectedDigest(null);
+  };
+
+  const handleUserMenuToggle = () => {
+    setShowUserMenu(!showUserMenu);
   };
 
   // Enhanced subscription management
@@ -899,13 +911,62 @@ const App = () => {
                   <span className="hidden sm:inline">Logout</span>
                 </button>
                 
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:bg-gray-700 transition-colors" title={`Logged in as ${currentUser?.full_name || 'Demo User'}`}>
-                    {getAvatarInitials(currentUser?.full_name)}
-                  </div>
-                  <div className="hidden sm:block text-sm text-gray-700">
-                    {currentUser?.full_name || 'Demo User'}
-                  </div>
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={handleUserMenuToggle}
+                    className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      {getAvatarInitials(currentUser?.full_name)}
+                    </div>
+                    <div className="hidden sm:block text-sm text-gray-700">
+                      {currentUser?.full_name || 'Demo User'}
+                    </div>
+                  </button>
+                  
+                  {showUserMenu && (
+                    <div className="absolute right-0 top-12 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-white font-medium">
+                            {getAvatarInitials(currentUser?.full_name)}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{currentUser?.full_name || 'Demo User'}</p>
+                            <p className="text-sm text-gray-500">{currentUser?.email || 'demo@example.com'}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="py-2">
+                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                          <User className="w-4 h-4" />
+                          <span>Profile</span>
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                          <Settings className="w-4 h-4" />
+                          <span>Settings</span>
+                        </button>
+                        <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                          <HelpCircle className="w-4 h-4" />
+                          <span>Help & Support</span>
+                        </button>
+                      </div>
+                      
+                      <div className="border-t border-gray-200 py-2">
+                        <button
+                          onClick={() => {
+                            console.log('🔄 Logout from user menu clicked')
+                            signOut()
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
