@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { weatherAPI } from '../../services/realApis';
-import { Cloud, Sun, CloudRain, Snow, Wind, Thermometer, Droplets, Eye, MapPin, RefreshCw } from 'lucide-react';
+import { Cloud, Sun, CloudRain, Snowflake, Wind, Thermometer, Droplets, Eye, MapPin, RefreshCw } from 'lucide-react';
 
 const WeatherWidget = () => {
   const [weather, setWeather] = useState(null);
@@ -146,7 +146,7 @@ const WeatherWidget = () => {
       case 'rainy':
         return <CloudRain className={`${size} text-blue-500`} />;
       case 'snowy':
-        return <Snow className={`${size} text-blue-200`} />;
+        return <Snowflake className={`${size} text-blue-200`} />;
       default:
         return <Sun className={`${size} text-yellow-500`} />;
     }

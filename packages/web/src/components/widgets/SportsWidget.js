@@ -7,9 +7,9 @@ import {
   Users, 
   TrendingUp, 
   RefreshCw,
-  Soccer,
-  Basketball,
   Circle,
+  Basketball,
+  CircleDot,
   Square
 } from 'lucide-react';
 
@@ -69,15 +69,15 @@ const SportsWidget = () => {
     switch (sport?.toLowerCase()) {
       case 'football':
       case 'soccer':
-        return <Soccer className="w-4 h-4" />;
+        return <Circle className="w-4 h-4" />;
       case 'basketball':
         return <Basketball className="w-4 h-4" />;
       case 'tennis':
-        return <Circle className="w-4 h-4" />;
+        return <CircleDot className="w-4 h-4" />;
       case 'volleyball':
         return <Square className="w-4 h-4" />;
       default:
-        return <Soccer className="w-4 h-4" />;
+        return <Circle className="w-4 h-4" />;
     }
   };
 
