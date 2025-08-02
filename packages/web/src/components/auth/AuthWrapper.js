@@ -8,7 +8,10 @@ const AuthWrapper = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const [authMode, setAuthMode] = useState('login'); // 'login', 'signup', 'forgot-password'
 
+  console.log('🔍 AuthWrapper: isAuthenticated =', isAuthenticated, 'loading =', loading);
+
   if (loading) {
+    console.log('🔍 AuthWrapper: Showing loading state');
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -22,6 +25,7 @@ const AuthWrapper = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    console.log('🔍 AuthWrapper: User not authenticated, showing login form');
     return (
       <>
         {authMode === 'login' && (
@@ -46,6 +50,7 @@ const AuthWrapper = ({ children }) => {
     );
   }
 
+  console.log('🔍 AuthWrapper: User authenticated, showing main app');
   return children;
 };
 

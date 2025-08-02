@@ -264,12 +264,24 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await mockAuthService.getSession()
-      if (session?.user) {
-        setUser(session.user)
-        await loadProfile(session.user.id)
+      try {
+        console.log('🔍 AuthContext: Initializing session...');
+        const session = await mockAuthService.getSession();
+        console.log('🔍 AuthContext: Session result:', session);
+        
+        if (session) {
+          console.log('🔍 AuthContext: User found, setting user state');
+          setUser(session.user);
+          await loadProfile(session.user.id);
+        } else {
+          console.log('🔍 AuthContext: No session found, user will need to login');
+        }
+      } catch (error) {
+        console.error('🔍 AuthContext: Error getting initial session:', error);
+      } finally {
+        console.log('🔍 AuthContext: Setting loading to false');
+        setLoading(false);
       }
-      setLoading(false)
     }
 
     getInitialSession()
