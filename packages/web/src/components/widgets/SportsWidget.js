@@ -8,8 +8,7 @@ import {
   TrendingUp, 
   RefreshCw,
   Circle,
-  Square,
-  BasketballIcon
+  Square
 } from 'lucide-react';
 
 const SportsWidget = () => {
@@ -70,7 +69,7 @@ const SportsWidget = () => {
       case 'soccer':
         return <Circle className="w-4 h-4" />;
       case 'basketball':
-        return <BasketballIcon className="w-4 h-4" />;
+        return <Square className="w-4 h-4" />;
       case 'tennis':
         return <Square className="w-4 h-4" />;
       case 'volleyball':
