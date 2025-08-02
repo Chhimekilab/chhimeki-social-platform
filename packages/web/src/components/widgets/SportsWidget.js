@@ -9,7 +9,6 @@ import {
   RefreshCw,
   Circle,
   Basketball,
-  CircleDot,
   Square
 } from 'lucide-react';
 
@@ -73,7 +72,7 @@ const SportsWidget = () => {
       case 'basketball':
         return <Basketball className="w-4 h-4" />;
       case 'tennis':
-        return <CircleDot className="w-4 h-4" />;
+        return <Square className="w-4 h-4" />;
       case 'volleyball':
         return <Square className="w-4 h-4" />;
       default:
