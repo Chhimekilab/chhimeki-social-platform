@@ -7,7 +7,7 @@ import {
   Image, 
   Mic, 
   MapPin, 
-  Poll,
+  BarChart3,
   MessageSquare,
   Settings,
   Zap,
@@ -52,7 +52,7 @@ const QuickActionsWidget = () => {
     },
     {
       id: 'poll',
-      icon: Poll,
+      icon: BarChart3,
       label: 'Create Poll',
       description: 'Ask your audience',
       color: 'bg-orange-500',
