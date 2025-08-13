@@ -265,15 +265,27 @@ export const mockAuthService = {
     }
     
     // Create mock session
+    const sessionUser = {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      username: user.username,
+      subscription_tier: user.subscription_tier,
+      followers_count: user.followers_count,
+      following_count: user.following_count,
+      bio: user.bio,
+      location: user.location,
+      website: user.website,
+      joined_date: user.joined_date,
+      verified: user.verified,
+      user_metadata: {
+        full_name: user.full_name,
+        username: user.username
+      }
+    };
+    
     const session = {
-      user: {
-        id: user.id,
-        email: user.email,
-        user_metadata: {
-          full_name: user.full_name,
-          username: user.username
-        }
-      },
+      user: sessionUser,
       access_token: 'mock_access_token_' + user.id,
       refresh_token: 'mock_refresh_token_' + user.id
     };
@@ -374,10 +386,7 @@ export const mockAuthService = {
       }
     }
     
-    return {
-      data: { session: currentSession },
-      error: null
-    };
+    return currentSession;
   },
 
   // Reset password

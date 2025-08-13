@@ -269,7 +269,7 @@ export const AuthProvider = ({ children }) => {
         const session = await mockAuthService.getSession();
         console.log('🔍 AuthContext: Session result:', session);
         
-        if (session) {
+        if (session && session.user) {
           console.log('🔍 AuthContext: User found, setting user state');
           setUser(session.user);
           await loadProfile(session.user.id);

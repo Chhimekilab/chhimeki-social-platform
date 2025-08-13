@@ -3,7 +3,7 @@ import { Eye, EyeOff, Mail, Lock, Users, ArrowRight, Loader2, User, Check, X, St
 import { useAuth } from '../../contexts/AuthContext';
 
 const SignupForm = ({ onSwitchToLogin }) => {
-  const { signup, loading, error } = useAuth();
+  const { signUp, loading, error } = useAuth();
   const [formData, setFormData] = useState({
     full_name: '',
     username: '',
@@ -91,15 +91,13 @@ const SignupForm = ({ onSwitchToLogin }) => {
     
     if (!validateForm()) return;
     
-    const result = await signup({
+    const result = await signUp(formData.email, formData.password, {
       full_name: formData.full_name.trim(),
-      username: formData.username.trim(),
-      email: formData.email,
-      password: formData.password
+      username: formData.username.trim()
     });
     
-    if (!result.success) {
-      setFormErrors({ submit: result.error });
+    if (result.error) {
+      setFormErrors({ submit: result.error.message || result.error });
     }
   };
 

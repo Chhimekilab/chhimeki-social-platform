@@ -28,10 +28,10 @@ const ForgotPasswordForm = ({ onSwitchToLogin }) => {
     setFormError('');
     
     const result = await resetPassword(email);
-    if (result.success) {
+    if (!result.error) {
       setSuccess(true);
     } else {
-      setFormError(result.error);
+      setFormError(result.error.message || result.error);
     }
   };
 
