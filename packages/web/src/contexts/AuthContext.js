@@ -266,6 +266,8 @@ export const AuthProvider = ({ children }) => {
     const getInitialSession = async () => {
       try {
         console.log('🔍 AuthContext: Initializing session...');
+        
+        // First try to get from mockAuthService
         const session = await mockAuthService.getSession();
         console.log('🔍 AuthContext: Session result:', session);
         
@@ -274,7 +276,25 @@ export const AuthProvider = ({ children }) => {
           setUser(session.user);
           await loadProfile(session.user.id);
         } else {
-          console.log('🔍 AuthContext: No session found, user will need to login');
+          console.log('🔍 AuthContext: No session found, checking localStorage directly');
+          
+          // Fallback: check localStorage directly
+          const storedSession = localStorage.getItem('mock_auth_session');
+          if (storedSession) {
+            try {
+              const parsedSession = JSON.parse(storedSession);
+              if (parsedSession && parsedSession.user) {
+                console.log('🔍 AuthContext: Found session in localStorage, restoring user');
+                setUser(parsedSession.user);
+                await loadProfile(parsedSession.user.id);
+              }
+            } catch (parseError) {
+              console.error('🔍 AuthContext: Error parsing stored session:', parseError);
+              localStorage.removeItem('mock_auth_session'); // Clean up corrupted data
+            }
+          } else {
+            console.log('🔍 AuthContext: No stored session found, user will need to login');
+          }
         }
       } catch (error) {
         console.error('🔍 AuthContext: Error getting initial session:', error);
@@ -330,14 +350,30 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       console.log('🔄 Signing out user...')
+      
+      // Call mockAuthService signOut
       const { error } = await mockAuthService.signOut()
       if (error) throw error
+      
+      // Clear all local state
       setUser(null)
       setProfile(null)
+      setError(null)
+      
+      // Ensure localStorage is cleared
+      localStorage.removeItem('mock_auth_session')
+      
       console.log('✅ User signed out successfully')
       return { error: null }
     } catch (error) {
       console.error('❌ Error signing out:', error)
+      
+      // Even if there's an error, clear local state
+      setUser(null)
+      setProfile(null)
+      setError(null)
+      localStorage.removeItem('mock_auth_session')
+      
       return { error }
     }
   }
@@ -367,6 +403,15 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const clearSession = () => {
+    console.log('🧹 Manually clearing session...')
+    setUser(null)
+    setProfile(null)
+    setError(null)
+    localStorage.removeItem('mock_auth_session')
+    console.log('✅ Session cleared manually')
+  }
+
   const value = {
     user,
     profile,
@@ -376,6 +421,7 @@ export const AuthProvider = ({ children }) => {
     signOut,
     updateProfile,
     resetPassword,
+    clearSession,
     isAuthenticated: !!user,
     // Beta helper - expose demo users for testing
     demoUsers: users.map(u => ({ email: u.email, password: u.password, name: u.full_name }))
