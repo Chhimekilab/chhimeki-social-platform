@@ -41,6 +41,7 @@ import AIDashboard from './components/ai/AIDashboard';
 import DigestViewer from './components/subscriptions/DigestViewer';
 import ChatInterface from './components/chat/ChatInterface';
 import ChatRooms from './components/chat/ChatRooms';
+import AuthDebugger from './components/auth/AuthDebugger';
 
 // Import new dashboard components
 import NeighborhoodDashboard from './components/dashboard/NeighborhoodDashboard';
@@ -1486,6 +1487,9 @@ const App = () => {
              onClose={handleCloseChatRooms}
            />
          )}
+
+         {/* Auth Debugger - Remove this in production */}
+         <AuthDebugger />
       </div>
 
       {/* Footer with Version Info */}
